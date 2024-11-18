@@ -249,7 +249,7 @@ async function createHtmlFile(code, classroomName) {
         const data = await response.json();
         
         // Generate classroom URL (now using GitHub URL)
-        const viewerURL = `https://github.com/${owner}/${repo}/blob/main/classrooms/viewClassroom_${code}.html`;
+        const viewerURL = `https://github.com/${owner}/${repo}/blob/main/classroom/createdClassroom_${code}.html`;
         // or for raw content:
         // const viewerURL = `https://raw.githubusercontent.com/${owner}/${repo}/main/classrooms/viewClassroom_${code}.html`;
 
