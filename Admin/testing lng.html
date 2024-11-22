@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV File Upload and Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            margin-top: 20px;
+            padding: 10px;
+            font-family: monospace;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-group">
+            <label for="csvFile">Select CSV File:</label>
+            <input type="file" id="csvFile" accept=".csv">
+        </div>
+        <textarea id="csvContent" readonly placeholder="CSV content will appear here..."></textarea>
+        <button onclick="uploadToFirebase()" style="margin-top: 10px;">Upload to Firebase</button>
+    </div>
+
+
+
+    <script type="module">
+       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+
+        
+    const firebaseConfig = {
+    apiKey: "AIzaSyDMAG-IV_0rZ9IkR3XlBQZohMo-xXGMd4Y",
+    authDomain: "logintesting-64bd1.firebaseapp.com",
+    databaseURL: "https://logintesting-64bd1-default-rtdb.firebaseio.com",
+    projectId: "logintesting-64bd1",
+    storageBucket: "logintesting-64bd1.appspot.com",
+    messagingSenderId: "1065274423800",
+    appId: "1:1065274423800:web:4f3eb8560429f32346be0d"
+  };
+
+        document.getElementById('csvFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const text = e.target.result;
+                document.getElementById('csvContent').value = text;
+            };
+            
+            reader.readAsText(file);
+        });
+
+        function uploadToFirebase() {
+            const content = document.getElementById('csvContent').value;
+            if (!content) {
+                alert('Please load a CSV file first');
+                return;
+            }
+
+            // Parse CSV content to array of objects
+            const rows = content.split('\n');
+            const headers = rows[0].split(',');
+            const data = [];
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i].split(',');
+                if (row.length === headers.length) {
+                    const rowData = {};
+                    headers.forEach((header, index) => {
+                        rowData[header.trim()] = row[index].trim();
+                    });
+                    data.push(rowData);
+                }
+            }
+
+            
+            const database = firebase.database();
+            const timestamp = new Date().getTime();
+            database.ref('csv_uploads/' + timestamp).set(data)
+                .then(() => {
+                    alert('Data uploaded successfully to Firebase!');
+                })
+                .catch((error) => {
+                    console.error('Error uploading data:', error);
+                    alert('Error uploading data to Firebase');
+                });
+        }
+    </script>
+</body>
+</html>
