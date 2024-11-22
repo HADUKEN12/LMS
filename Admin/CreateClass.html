@@ -51,25 +51,6 @@
                         <option value="BSCPE">BSCPE</option>
                     </select>
                 </div>
-                <div class="mb-4">
-                    <label for="classroom-image" class="block text-gray-700 font-bold mb-2">Classroom Image</label>
-                    <div class="flex items-center space-x-2">
-                        <input type="file" 
-                               id="classroom-image" 
-                               accept="image/*"
-                               class="hidden" 
-                               onchange="previewImage(event)">
-                        <button type="button" 
-                                onclick="document.getElementById('classroom-image').click()" 
-                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                            Choose Image
-                        </button>
-                        <span id="file-name" class="text-gray-600">No file chosen</span>
-                    </div>
-                    <div id="image-preview" class="mt-2 hidden">
-                        <img id="preview" class="max-w-xs rounded-lg shadow-md">
-                    </div>
-                </div>
                 <div class="flex justify-end">
                     <button type="button" onclick="generateClassroomCode()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Generate Code</button>
                     <button type="submit" class="ml-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Create Classroom</button>
@@ -142,22 +123,13 @@
             const yearLevel = document.getElementById('year-level').value;
             const course = document.getElementById('course').value;
             const professorId = document.getElementById('professor').value;
-            const imageFile = document.getElementById('classroom-image').files[0];
             
             if (code && classroomName && yearLevel && course && professorId) {
                 try {
-                    let imageUrl = null;
-                    if (imageFile) {
-                        // Upload image if one was selected
-                        const imageRef = storageRef(storage, `classroom-images/${code}_${imageFile.name}`);
-                        await uploadBytes(imageRef, imageFile);
-                        imageUrl = await getDownloadURL(imageRef);
-                    }
-                    
-                    createHtmlFile(code, classroomName, yearLevel, course, professorId, imageUrl);
+                    createHtmlFile(code, classroomName, yearLevel, course, professorId, null);
                 } catch (error) {
-                    console.error('Error uploading image:', error);
-                    alert('Failed to upload image. Please try again.');
+                    console.error('Error creating classroom:', error);
+                    alert('Failed to create classroom. Please try again.');
                 }
             } else {
                 alert('Please fill in all required fields before submitting.');
@@ -421,21 +393,6 @@
             window.generateClassroomCode = generateClassroomCode;
 
             loadProfessors();
-
-            function previewImage(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        document.getElementById('preview').src = e.target.result;
-                        document.getElementById('image-preview').classList.remove('hidden');
-                        document.getElementById('file-name').textContent = file.name;
-                    }
-                    reader.readAsDataURL(file);
-                }
-            }
-
-            window.previewImage = previewImage;
 
     </script>
 </body>
