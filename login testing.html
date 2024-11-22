@@ -1,0 +1,537 @@
+<html>
+ <head>
+  <title>
+   Welcome to LMS Login Page
+  </title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href=
+  "https://firebasestorage.googleapis.com/v0/b/logintesting-64bd1.appspot.com/o/images.jpeg?alt=media&token=082fbade-96c6-4a5f-887b-28dbc84f03c6"
+          type="image/x-icon" />
+  <style>
+   body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #1A237E;
+            color: #E0E0E0;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .login-box {
+            background-color: #283593;
+            width: 100%;
+            max-width: 1000px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .login-box .left {
+            width: 100%;
+            background-color: #303F9F;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .login-box .left img {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .login-box .right {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .login-box .right h2 {
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+        .login-box .right p {
+            color: #BDBDBD;
+            margin-bottom: 20px;
+        }
+     
+
+    .login-box .right {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .login-box .right #studentForm,
+    .login-box .right #professorForm {
+        width: 100%;
+    }
+    .login-box .right .input-group {
+        margin-bottom: 20px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+    }
+    .login-box .right .input-group input {
+        width: calc(100% - 39px);
+        padding: 15px;
+        border: 1px solid #5C6BC0;
+        border-radius: 5px;
+        background-color: #3949AB;
+        color: #FFFFFF;
+        font-size: 16px;
+    }
+    .login-box .right .input-group i {
+        color: #90CAF9;
+        margin-right: 15px;
+        width: 24px;
+        text-align: center;
+        font-size: 20px;
+    }
+  
+
+        .login-box .right .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+        .login-box .right .options input {
+            margin-right: 5px;
+        }
+        .login-box .right .options a {
+            color: #90CAF9;
+            text-decoration: none;
+        }
+        .login-box .right .btn {
+            background-color: #1E88E5;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .login-box .right .signup {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .login-box .right .signup a {
+            color: #90CAF9;
+            text-decoration: none;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #BDBDBD;
+        }
+        .footer a {
+            color: #90CAF9;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        @media (min-width: 768px) {
+            .login-box {
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 40px;
+            }
+            .login-box .left {
+                width: 50%;
+                margin-bottom: 0;
+            }
+            .login-box .right {
+                width: 45%;
+            }
+        }
+        .school-logo {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        @media (min-width: 768px) {
+            .school-logo {
+                max-width: 80%;
+            }
+        }
+        .toggle-buttons {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .toggle-btn {
+        background-color: #3949AB;
+        color: #FFFFFF;
+        border: none;
+        padding: 10px 20px;
+        margin: 0 5px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    .toggle-btn.active {
+        background-color: #1E88E5;
+    }
+    .popup-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+
+    .popup-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #283593;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        z-index: 1001;
+        max-width: 400px;
+        width: 90%;
+    }
+
+    .popup-message {
+        color: #FFFFFF;
+        font-size: 18px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .popup-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .popup-btn {
+        padding: 10px 25px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .popup-btn-primary {
+        background-color: #1E88E5;
+        color: white;
+    }
+
+    .popup-btn-secondary {
+        background-color: #3949AB;
+        color: white;
+    }
+
+    .popup-btn:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+    }
+  </style>
+ </head>
+ <body>
+  <div class="container">
+   <div class="login-box">
+    <div class="left">
+     <img alt="School logo" src="Dfcam logo.png" class="school-logo"/>
+    </div>
+    <div class="right">
+        <h2>Welcome to LMS</h2>
+        <p>Login to continue as a student or professor</p>
+        <div class="toggle-buttons">
+            <button id="studentToggle" class="toggle-btn active" onclick="toggleForm('student')">Student</button>
+            <button id="professorToggle" class="toggle-btn" onclick="toggleForm('professor')">Professor</button>
+        </div>
+        <div id="studentForm">
+            <div class="input-group">
+                <i class="fas fa-id-card"></i>
+                <input id="studentId" placeholder="Student ID" type="text"/>
+            </div>
+            <button class="btn" onclick="checkLogin('student')">Student Sign In</button>
+        </div>
+        <div id="professorForm" style="display: none;">
+            <div class="input-group">
+                <i class="fas fa-id-badge"></i>
+                <input id="professorId" placeholder="Professor ID" type="text"/>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input id="professorPassword" placeholder="Password" type="password"/>
+            </div>
+            <button class="btn" onclick="checkLogin('professor')">Professor Sign In</button>
+        </div>
+        <div id="message" style="color: green; margin-top: 10px;"></div>
+    </div>
+   </div>
+  </div>
+  <div class="footer">
+   
+   
+   </a>
+  </div>
+  <div class="popup-overlay" id="customPopup">
+    <div class="popup-container">
+        <div class="popup-message">Student ID was found. Would you like to register?</div>
+        <div class="popup-buttons">
+            <button class="popup-btn popup-btn-primary" onclick="handlePopupResponse(true)">Yes, Register</button>
+            <button class="popup-btn popup-btn-secondary" onclick="handlePopupResponse(false)">No, Cancel</button>
+        </div>
+    </div>
+</div>
+  <script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getStorage, ref as storageRef, uploadString } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDMAG-IV_0rZ9IkR3XlBQZohMo-xXGMd4Y",
+  authDomain: "logintesting-64bd1.firebaseapp.com",
+  databaseURL: "https://logintesting-64bd1-default-rtdb.firebaseio.com",
+  projectId: "logintesting-64bd1",
+  storageBucket: "logintesting-64bd1.appspot.com",
+  messagingSenderId: "1065274423800",
+  appId: "1:1065274423800:web:4f3eb8560429f32346be0d"
+};
+
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+    window.toggleForm = function(formType) {
+        const studentForm = document.getElementById('studentForm');
+        const professorForm = document.getElementById('professorForm');
+        const studentToggle = document.getElementById('studentToggle');
+        const professorToggle = document.getElementById('professorToggle');
+
+        if (formType === 'student') {
+            document.getElementById('studentId').value = '';
+        } else {
+            document.getElementById('professorId').value = '';
+        }
+
+        if (formType === 'student') {
+            studentForm.style.display = 'block';
+            professorForm.style.display = 'none';
+            studentToggle.classList.add('active');
+            professorToggle.classList.remove('active');
+        } else {
+            studentForm.style.display = 'none';
+            professorForm.style.display = 'block';
+            studentToggle.classList.remove('active');
+            professorToggle.classList.add('active');
+        }
+    }
+
+    window.checkLogin = async function(userType) {
+        var id, messageElement;
+        messageElement = document.getElementById('message');
+
+        if (userType === 'student') {
+            id = document.getElementById('studentId');
+        } else {
+            id = document.getElementById('professorId');
+        }
+
+        try {
+            if (userType === 'student') {
+                const dbRef = ref(database);
+                const snapshot = await get(child(dbRef, `student/${id.value}`));
+
+                if (snapshot.exists()) {
+                    const passwordPopup = document.createElement('div');
+                    passwordPopup.style.position = 'fixed';
+                    passwordPopup.style.top = '0';
+                    passwordPopup.style.left = '0';
+                    passwordPopup.style.width = '100%';
+                    passwordPopup.style.height = '100%';
+                    passwordPopup.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                    passwordPopup.style.display = 'flex';
+                    passwordPopup.style.justifyContent = 'center';
+                    passwordPopup.style.alignItems = 'center';
+                    passwordPopup.style.zIndex = '1000';
+
+                    passwordPopup.innerHTML = `
+                        <div style="
+                            background-color: #283593;
+                            padding: 25px;
+                            border-radius: 10px;
+                            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+                            width: 90%;
+                            max-width: 400px;
+                        ">
+                            <h3 style="margin-bottom: 15px; color: #FFFFFF; text-align: center;">Confirmation Process</h3>
+                            <h3 style="margin-bottom: 15px; color: #FFFFFF; text-align: center;">Enter Password</h3>
+                            <div style="
+                                display: flex;
+                                align-items: center;
+                                margin-bottom: 20px;
+                            ">
+                                <i class="fas fa-lock" style="
+                                    color: #90CAF9;
+                                    margin-right: 15px;
+                                    width: 24px;
+                                    text-align: center;
+                                    font-size: 20px;
+                                "></i>
+                                <input type="password" id="studentPassword" style="
+                                    width: calc(100% - 39px);
+                                    padding: 15px;
+                                    border: 1px solid #5C6BC0;
+                                    border-radius: 5px;
+                                    background-color: #3949AB;
+                                    color: #FFFFFF;
+                                    font-size: 16px;
+                                ">
+                            </div>
+                            <button onclick="verifyPassword('${id.value}')" style="
+                                background-color: #1E88E5;
+                                color: #fff;
+                                padding: 10px 20px;
+                                border: none;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                width: 100%;
+                                font-size: 16px;
+                                transition: opacity 0.3s ease;
+                            ">Login</button>
+                            <button onclick="this.parentElement.parentElement.remove()" style="
+                                background-color: #3949AB;
+                                color: #fff;
+                                padding: 10px 20px;
+                                border: none;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                width: 100%;
+                                margin-top: 10px;
+                                font-size: 16px;
+                                transition: opacity 0.3s ease;
+                            ">Cancel</button>
+                        </div>
+                    `;
+
+                    document.body.appendChild(passwordPopup);
+                } else {
+                    showCustomPopup(id.value);
+                }
+            } else {
+                if (id.value === "12345") {
+                    messageElement.textContent = "Login successful!! ";
+                    messageElement.style.color = "#A5D6A7";
+                    
+                    setTimeout(() => {
+                        window.location.href = "Dashboard Professor.html";
+                    }, 5000);
+                } else if (id.value === "admin" && document.getElementById('professorPassword').value === "admin123") {
+                    messageElement.textContent = "Admin login successful! Redirecting...";
+                    messageElement.style.color = "#A5D6A7";
+                    
+                    setTimeout(() => {
+                        window.location.href = "Admin/Dashboard Admin.html";
+                    }, 2000);
+                } else {
+                    messageElement.textContent = "User not found";
+                    messageElement.style.color = "#FF8A80";
+                }
+            }
+        } catch (error) {
+            messageElement.textContent = "Error checking credentials: " + error.message;
+            messageElement.style.color = "#FF8A80";
+        }
+
+        id.value = "";
+    }
+
+    window.showCustomPopup = function(studentId) {
+        const popup = document.getElementById('customPopup');
+        popup.style.display = 'block';
+        window.currentStudentId = studentId; 
+    }
+
+    window.handlePopupResponse = function(confirmed) {
+        const popup = document.getElementById('customPopup');
+        const messageElement = document.getElementById('message');
+        
+        popup.style.display = 'none';
+        
+        if (confirmed) {
+            window.location.href = `register.html?studentId=${window.currentStudentId}`;
+        } else {
+            messageElement.textContent = "Student ID not found";
+            messageElement.style.color = "#FF8A80";
+        }
+    }
+
+    window.verifyPassword = async function(studentId) {
+        const password = document.getElementById('studentPassword').value;
+        const messageElement = document.getElementById('message');
+        
+        try {
+            const dbRef = ref(database);
+            const snapshot = await get(child(dbRef, `student/${studentId}`));
+            
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                if (userData.password === password) {
+                    messageElement.textContent = "Login successful! Redirecting in 5 seconds...";
+                    messageElement.style.color = "#A5D6A7";
+                    
+                    document.querySelector('[style*="position: fixed"]').remove();
+                    
+                   
+                    setTimeout(() => {
+                        window.location.href = "Student/Dashboard Student.html";
+                    }, 5000);
+                } else {
+                    
+                    document.getElementById('studentPassword').value = '';
+                    
+                    
+                    const errorDiv = document.createElement('div');
+                    errorDiv.id = 'password-error';
+                    errorDiv.style.color = '#FF8A80';
+                    errorDiv.style.textAlign = 'center';
+                    errorDiv.style.marginTop = '10px';
+                    errorDiv.style.fontSize = '14px';
+                    errorDiv.textContent = 'Wrong password. Please try again.';
+                    
+                    
+                    const existingError = document.getElementById('password-error');
+                    if (existingError) {
+                        existingError.remove();
+                    }
+                    
+                    
+                    const inputGroup = document.getElementById('studentPassword').parentElement;
+                    inputGroup.insertAdjacentElement('afterend', errorDiv);
+                }
+            }
+        } catch (error) {
+            messageElement.textContent = "Error verifying password: " + error.message;
+            messageElement.style.color = "#FF8A80";
+            
+            document.querySelector('[style*="position: fixed"]').remove();
+        }
+    }
+</script>
+</body>
+</html>
