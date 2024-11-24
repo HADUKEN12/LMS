@@ -1,148 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+                      <title>DFCAMCLMS - Classroom</title>
+                        <link rel="icon" href="https://firebasestorage.googleapis.com/v0/b/logintesting-64bd1.appspot.com/o/images.jpeg?alt=media&token=082fbade-96c6-4a5f-887b-28dbc84f03c6"
+          type="image/x-icon" class="school-logo"/>
+                        <script src="https://cdn.tailwindcss.com">
+                        </script>
 
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <title>Created Classroom</title>
-                <script src="https://cdn.tailwindcss.com">
-                </script>
+                        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+                  <style>
+                   .toggle-animation {
+                    transition: transform 0.3s ease-in-out;
+                   }
+                   .toggle-animation.active {
+                    transform: rotate(180deg);
+                   }
+                   .sidebar-transition {
+                    transition: transform 0.3s ease-in-out, margin-left 0.3s ease-in-out;
+                   }
+                    </style>
+                        </head>
+                        <body>
+                            <body class="bg-gray-100" id="body">
+                      <div class="flex h-screen">
+                       <!-- Sidebar -->
+                       <div id="sidebar" class="bg-blue-700 text-white w-64 flex flex-col transition-all duration-300 transform -translate-x-full md:translate-x-0 sidebar-transition">
+                        <div class="flex items-center justify-between p-4 bg-blue-600">
+                         <div class="flex items-center">
+                          <i class="fas fa-bars text-2xl cursor-pointer md:hidden" onclick="toggleSidebar()">
+                          </i>
+                          <span class="ml-2 text-yellow-400 text-2xl font-bold">
+                           CLASSROOM
+                          </span>
+                         </div>
+                         <img alt="School logo" class="ml-2" height="30" src="../Dfcam logo.png" width="30"/>
+                        </div>
+                        <nav class="flex flex-col mt-4">
+                         <a class="flex items-center p-4 bg-blue-800" href="">
+                          <i class="fas fa-tachometer-alt mr-2">
+                          </i>
+                          DASHBOARD
+                          </a>
+                          <a class="flex items-center p-4 hover:bg-blue-800" href="#" onclick="navigateToAssignments()"> 
+                          <i class="fas fa-user-graduate mr-2"></i> 
+                          ASSIGNMENTS
+                         </a>
+                         <a class="flex items-center p-4 hover:bg-blue-800" href="#" onclick="navigateToLectures()">
+                          <i class="fas fa-chalkboard-teacher mr-2"></i>
+                          LECTURES
+                         </a>
+                         <a class="flex items-center p-4 hover:bg-blue-800" href=""> 
+                          <i class="fas fa-school mr-2">
+                          </i>
+                          UPLOADED FILES
+                         </a>
+                        </nav>
+                        <div class="mt-auto p-4">
+                         <i class="fas fa-cog text-2xl">
+                         </i>
+                        </div>
+                       </div>
+                       <!-- Main Content -->
+                       <div class="flex-1 flex flex-col sidebar-transition">
+                        <div class="flex items-center justify-between p-4 bg-blue-600 text-white">
+                         <div class="flex items-center">
+                          <i class="fas fa-bars text-2xl cursor-pointer md:hidden" onclick="toggleSidebar()">
+                          </i>
+                          <i class="fas fa-th-large text-2xl ml-4">
+                          </i>
+                          <span class="ml-2 text-xl font-bold" id="welcomeMessage">Welcome</span>
+                         </div>
+                         <div class="flex items-center">
+                          <i class="fas fa-toggle-on text-2xl mr-4 cursor-pointer toggle-animation" onclick="toggleDarkMode()">
+                          </i>
+                           <i class="fas fa-user-circle text-2xl cursor-pointer" onclick="handleUserClick()">
+                          </i>
+                         </div>
+                        </div>
+                        <div class="flex-1 p-6 bg-gray-100">
+                          <!-- Classroom Header Section -->
+                          <div class="mb-8">
+                            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                              <div class="h-64 bg-gray-200 relative">
+                                <img id="classroomImage" src="" alt="Classroom Image" class="w-full h-full object-cover"/>
+                                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                                  <h1 id="classroomName" class="text-3xl font-bold text-white mb-2">Loading...</h1>
+                                  <div class="flex items-center text-white">
+                                    <i class="fas fa-user-tie mr-2"></i>
+                                    <p id="professorName" class="text-lg">Loading...</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
 
-                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-  <style>
-   .toggle-animation {
-    transition: transform 0.3s ease-in-out;
-   }
-   .toggle-animation.active {
-    transform: rotate(180deg);
-   }
-   .sidebar-transition {
-    transition: transform 0.3s ease-in-out, margin-left 0.3s ease-in-out;
-   }
-    </style>
-                    </head>
-                    <body>
-                        <body class="bg-gray-100" id="body">
-  <div class="flex h-screen">
-   <!-- Sidebar -->
-   <div id="sidebar" class="bg-blue-700 text-white w-64 flex flex-col transition-all duration-300 transform -translate-x-full md:translate-x-0 sidebar-transition">
-    <div class="flex items-center justify-between p-4 bg-blue-600">
-     <div class="flex items-center">
-      <i class="fas fa-bars text-2xl cursor-pointer md:hidden" onclick="toggleSidebar()">
-      </i>
-      <span class="ml-2 text-yellow-400 text-2xl font-bold">
-       CLASSROOM
-      </span>
-     </div>
-     <img alt="School logo" class="ml-2" height="30" src="https://github.com/HADUKEN12/LMS/blob/main/images.jpeg" width="30"/>
-    </div>
-    <nav class="flex flex-col mt-4">
-     <a class="flex items-center p-4 bg-blue-800" href="Dashboard Admin.html">
-      <i class="fas fa-tachometer-alt mr-2">
-      </i>
-      DASHBOARD
-      </a>
-      <a class="flex items-center p-4 hover:bg-blue-800" href="ListofStudent.html"> 
-      <i class="fas fa-user-graduate mr-2">
-      </i>
-      LIST OF STUDENTS
-     </a>
-     <a class="flex items-center p-4 hover:bg-blue-800" href=""> <!-- Updated href -->
-      <i class="fas fa-chalkboard-teacher mr-2">
-      </i>
-      LIST OF TEACHERS
-     </a>
-     <a class="flex items-center p-4 hover:bg-blue-800" href=""> <!-- Updated href -->
-      <i class="fas fa-school mr-2">
-      </i>
-      LIST OF CLASSROOMS
-     </a>
-    </nav>
-    <div class="mt-auto p-4">
-     <i class="fas fa-cog text-2xl">
-     </i>
-    </div>
-   </div>
-   <!-- Main Content -->
-   <div class="flex-1 flex flex-col sidebar-transition">
-    <div class="flex items-center justify-between p-4 bg-blue-600 text-white">
-     <div class="flex items-center">
-      <i class="fas fa-bars text-2xl cursor-pointer md:hidden" onclick="toggleSidebar()">
-      </i>
-      <i class="fas fa-th-large text-2xl ml-4">
-      </i>
-      <span class="ml-2 text-xl font-bold">Welcome Admin</span>
-     </div>
-     <div class="flex items-center">
-      <i class="fas fa-toggle-on text-2xl mr-4 cursor-pointer toggle-animation" onclick="toggleDarkMode()">
-      </i>
-       <i class="fas fa-user-circle text-2xl cursor-pointer" onclick="handleUserClick()">
-      </i>
-     </div>
-    </div>
-    <div class="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="classroom-grid">
-     
-    </div>
-    <div class="fixed bottom-4 right-4">
-     
-    </div>
-   </div>
-  </div>
+                          <!-- Statistics Section -->
+                          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" id="statisticsSection" style="display: none;">
+                            <div class="bg-white rounded-lg shadow-md p-6">
+                              <div class="flex items-center">
+                                <div class="p-3 bg-blue-100 rounded-full">
+                                  <i class="fas fa-users text-blue-600 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                  <h3 class="text-gray-500 text-sm">Students Enrolled</h3>
+                                  <p id="studentCount" class="text-2xl font-semibold">Loading...</p>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow-md p-6">
+                              <div class="flex items-center">
+                                <div class="p-3 bg-green-100 rounded-full">
+                                  <i class="fas fa-book text-green-600 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                  <h3 class="text-gray-500 text-sm">Total Assignments</h3>
+                                  <p id="assignmentCount" class="text-2xl font-semibold">0</p>
+                                </div>
+                              </div>
+                            </div>
 
-  <div id="logoutPopup" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg shadow-xl">
-      <h2 class="text-xl font-bold mb-4">Logout Confirmation</h2>
-      <p class="mb-4">Are you sure you want to logout?</p>
-      <div class="flex justify-end">
-        <button onclick="closeLogoutPopup()" class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded mr-2">
-          Cancel
-        </button>
-        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
-          Logout
-        </button>
-      </div>
-    </div>
-  </div>
-  <script>
+                            <div class="bg-white rounded-lg shadow-md p-6">
+                              <div class="flex items-center">
+                                <div class="p-3 bg-purple-100 rounded-full">
+                                  <i class="fas fa-video text-purple-600 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                  <h3 class="text-gray-500 text-sm">Total Lectures</h3>
+                                  <p id="lectureCount" class="text-2xl font-semibold">0</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Add this before the Recent Activity Section -->
+                          <div class="mb-8" id="announcementButtonContainer" style="display: none;">
+                            <button onclick="showAnnouncementPopup()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center">
+                              <i class="fas fa-bullhorn mr-2"></i>
+                              Create Announcement
+                            </button>
+                          </div>
+
+                          <!-- Recent Activity Section -->
+                          <div class="bg-white rounded-lg shadow-md p-6">
+                            <h2 class="text-xl font-semibold mb-4">Recent Activity</h2>
+                            <div id="recentActivity" class="space-y-4">
+                              <!-- Activity items will be dynamically added here -->
+                              <div class="flex items-center p-4 border-b">
+                                <div class="p-3 bg-gray-100 rounded-full">
+                                  <i class="fas fa-clock text-gray-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                  <p class="text-gray-600">No recent activity</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                       </div>
+                      </div>
+
+                      <div id="logoutPopup" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+                        <div class="bg-white p-6 rounded-lg shadow-xl">
+                          <h2 class="text-xl font-bold mb-4">Logout Confirmation</h2>
+                          <p class="mb-4">Are you sure you want to logout?</p>
+                          <div class="flex justify-end">
+                            <button onclick="closeLogoutPopup()" class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded mr-2">
+                              Cancel
+                            </button>
+                            <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+                              Logout
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Add this new popup div before the logout popup -->
+                      <div id="announcementPopup" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+                        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg">
+                          <h2 class="text-xl font-bold mb-4">Create Announcement</h2>
+                          <textarea id="announcementText" class="w-full h-32 p-2 border rounded-lg mb-4" placeholder="Write your announcement here..."></textarea>
+                          <div class="flex justify-end">
+                            <button onclick="closeAnnouncementPopup()" class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded mr-2">
+                              Cancel
+                            </button>
+                            <button onclick="createAnnouncement()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                              Post
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <script type="module">
+                        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+                        import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+                        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+                    
+                        const firebaseConfig = {
+                          apiKey: "AIzaSyDMAG-IV_0rZ9IkR3XlBQZohMo-xXGMd4Y",
+                          authDomain: "logintesting-64bd1.firebaseapp.com",
+                          databaseURL: "https://logintesting-64bd1-default-rtdb.firebaseio.com",
+                          projectId: "logintesting-64bd1",
+                          storageBucket: "logintesting-64bd1.appspot.com",
+                          messagingSenderId: "1065274423800",
+                          appId: "1:1065274423800:web:4f3eb8560429f32346be0d"
+                        };
+                    
+                        const app = initializeApp(firebaseConfig);
+                        const db = getDatabase();
+                        const storage = getStorage();
+                                           
+
+                       function toggleSidebar() {
+                        const sidebar = document.getElementById('sidebar');
+                        const mainContent = document.querySelector('.flex-1');
+                        sidebar.classList.toggle('-translate-x-full');
+                        mainContent.classList.toggle('ml-0');
+                        mainContent.classList.toggle('ml-64');
+                       }
+
+                       function toggleDarkMode() {
+                        const body = document.getElementById('body');
+                        body.classList.toggle('bg-gray-900');
+                        body.classList.toggle('text-white');
+                        const sidebar = document.getElementById('sidebar');
+                        sidebar.classList.toggle('bg-gray-800');
+                        const mainContent = document.querySelector('.flex-1');
+                        mainContent.classList.toggle('bg-gray-800');
+                        const classroomGrid = document.getElementById('classroom-grid');
+                        classroomGrid.classList.toggle('bg-gray-800');
+
+                        // Toggle animation
+                        const toggleIcon = document.querySelector('.fa-toggle-on');
+                        toggleIcon.classList.toggle('active');
+                       }
+
+                       function handleUserClick() {
+                         const logoutPopup = document.getElementById('logoutPopup');
+                         logoutPopup.classList.remove('hidden');
+                       }
+
+                       function closeLogoutPopup() {
+                         const logoutPopup = document.getElementById('logoutPopup');
+                         logoutPopup.classList.add('hidden');
+                       }
+
+                       function logout() {
                          
+                         window.location.href = '../login testing.html';
+                       }
 
-   function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.querySelector('.flex-1');
-    sidebar.classList.toggle('-translate-x-full');
-    mainContent.classList.toggle('ml-0');
-    mainContent.classList.toggle('ml-64');
-   }
+                       async function loadClassroomDetails() {
+                         try {
+                           
+                           // Get classroom ID and user type from URL
+                           const urlParams = new URLSearchParams(window.location.search);
+                           const userType = urlParams.get('userType'); // Expecting 'professor' or 'student'
+                           const filename = document.location.pathname.split('/').pop();
+                           const classroomId = filename.split('_')[1].replace('.html', '');
+                           
+                           if (classroomId) {
+                             const classroomRef = ref(db, `Classrooms/${classroomId}`);
+                             const snapshot = await get(classroomRef);
+                             
+                             if (snapshot.exists()) {
+                               const classroomData = snapshot.val();
+                               
+                               // Show announcement button only if user is a professor
+                               const announcementButton = document.getElementById('announcementButtonContainer');
+                               if (userType === 'professor') {
+                                 announcementButton.style.display = 'block';
+                               }
+                               
+                               // Update classroom name
+                               document.getElementById('classroomName').textContent = classroomData.name;
+                               document.getElementById('welcomeMessage').textContent = `Welcome to ${classroomData.name}`;
+                               
+                               // Update professor name
+                               if (classroomData.professorId) {
+                                 const professorRef = ref(db, `users/${classroomData.professorId}`);
+                                 const professorSnapshot = await get(professorRef);
+                                 if (professorSnapshot.exists()) {
+                                   const professorData = professorSnapshot.val();
+                                   document.getElementById('professorName').textContent = professorData.name || 'Professor';
+                                 }
+                               }
+                               
+                               // Update classroom image
+                               if (classroomData.imageUrl) {
+                                 document.getElementById('classroomImage').src = classroomData.imageUrl;
+                               } else {
+                                 // Set a default image if none exists
+                                 document.getElementById('classroomImage').src = 'https://via.placeholder.com/400x300?text=Classroom';
+                               }
+                               
+                               // Update student count if available
+                               if (classroomData.students) {
+                                 const studentCount = Object.keys(classroomData.students).length;
+                                 document.getElementById('studentCount').textContent = `${studentCount} Student${studentCount !== 1 ? 's' : ''}`;
+                               } else {
+                                 document.getElementById('studentCount').textContent = '0 Students';
+                               }
 
-   function toggleDarkMode() {
-    const body = document.getElementById('body');
-    body.classList.toggle('bg-gray-900');
-    body.classList.toggle('text-white');
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('bg-gray-800');
-    const mainContent = document.querySelector('.flex-1');
-    mainContent.classList.toggle('bg-gray-800');
-    const classroomGrid = document.getElementById('classroom-grid');
-    classroomGrid.classList.toggle('bg-gray-800');
+                               // Load announcements
+                               if (classroomData.announcements) {
+                                 // Clear the "No recent activity" message
+                                 const recentActivity = document.getElementById('recentActivity');
+                                 recentActivity.innerHTML = '';
 
-    // Toggle animation
-    const toggleIcon = document.querySelector('.fa-toggle-on');
-    toggleIcon.classList.toggle('active');
-   }
+                                 // Convert announcements object to array and sort by timestamp
+                                 const announcements = Object.values(classroomData.announcements)
+                                   .sort((a, b) => b.timestamp - a.timestamp);
 
-   function handleUserClick() {
-     const logoutPopup = document.getElementById('logoutPopup');
-     logoutPopup.classList.remove('hidden');
-   }
+                                 // Display each announcement
+                                 announcements.forEach(announcement => {
+                                   addAnnouncementToActivity(announcement);
+                                 });
+                               }
+                             }
+                           }
+                         } catch (error) {
+                           console.error('Error loading classroom details:', error);
+                         }
+                       }
 
-   function closeLogoutPopup() {
-     const logoutPopup = document.getElementById('logoutPopup');
-     logoutPopup.classList.add('hidden');
-   }
+                       // Call the function when the page loads
+                       loadClassroomDetails();
 
-   function logout() {
-     
-     window.location.href = 'login testing.html';
-   }
-                    </script>
-                </body>
-                </html>
-            
+                       // Make functions globally accessible
+                       window.showAnnouncementPopup = function() {
+                         const popup = document.getElementById('announcementPopup');
+                         popup.classList.remove('hidden');
+                       }
+
+                       window.closeAnnouncementPopup = function() {
+                         const popup = document.getElementById('announcementPopup');
+                         popup.classList.add('hidden');
+                       }
+
+                       window.createAnnouncement = async function() {
+                         try {
+                           const text = document.getElementById('announcementText').value.trim();
+                           if (!text) return;
+
+                           const filename = document.location.pathname.split('/').pop();
+                           const classroomId = filename.split('_')[1].replace('.html', '');
+                           
+                           const announcement = {
+                             text: text,
+                             timestamp: Date.now(),
+                             type: 'announcement'
+                           };
+
+                           // Add to classroom's announcements
+                           const announcementRef = ref(db, `Classrooms/${classroomId}/announcements`);
+                           const newAnnouncementRef = push(announcementRef);
+                           await set(newAnnouncementRef, announcement);
+
+                           // Update the UI
+                           addAnnouncementToActivity(announcement);
+                           
+                           // Close popup and clear text
+                           document.getElementById('announcementText').value = '';
+                           closeAnnouncementPopup();
+                         } catch (error) {
+                           console.error('Error creating announcement:', error);
+                         }
+                       }
+
+                       function addAnnouncementToActivity(announcement) {
+                         const recentActivity = document.getElementById('recentActivity');
+                         
+                         
+                         if (recentActivity.querySelector('p.text-gray-600')?.textContent === 'No recent activity') {
+                           recentActivity.innerHTML = '';
+                         }
+
+                         const date = new Date(announcement.timestamp);
+                         const timeString = date.toLocaleString();
+
+                         const announcementHTML = `
+                           <div class="flex items-center p-4 border-b">
+                             <div class="p-3 bg-blue-100 rounded-full">
+                               <i class="fas fa-bullhorn text-blue-600"></i>
+                             </div>
+                             <div class="ml-4 flex-1">
+                               <p class="text-gray-800">${announcement.text}</p>
+                               <p class="text-sm text-gray-500 mt-1">${timeString}</p>
+                             </div>
+                           </div>
+                         `;
+
+                         recentActivity.insertAdjacentHTML('afterbegin', announcementHTML);
+                       }
+
+                       window.navigateToAssignments = function() {
+                         const urlParams = new URLSearchParams(window.location.search);
+                         const userType = urlParams.get('userType');
+                         const filename = document.location.pathname.split('/').pop();
+                         const classroomId = filename.split('_')[1].replace('.html', '');
+                         
+                         // Get the current user's ID (assuming it's stored somewhere)
+                         const userId = urlParams.get('userId'); // Add this parameter to your URL when creating the classroom page
+                         
+                         // Redirect to assignments page with necessary parameters
+                         window.location.href = `assignments.html?classroomId=${classroomId}&userType=${userType}&userId=${userId}`;
+                       }
+
+                       window.navigateToLectures = function() {
+                         const urlParams = new URLSearchParams(window.location.search);
+                         const userType = urlParams.get('userType');
+                         const filename = document.location.pathname.split('/').pop();
+                         const classroomId = filename.split('_')[1].replace('.html', '');
+                         const userId = urlParams.get('userId');
+                         
+                         window.location.href = `lectures.html?classroomId=${classroomId}&userType=${userType}&userId=${userId}`;
+                       }
+                                            </script>
+                            </body>
+                            </html>
+                        
