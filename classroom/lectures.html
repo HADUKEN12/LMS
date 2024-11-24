@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>DFCAMCLMS - Lectures</title>
+  <link rel="icon" href="https://firebasestorage.googleapis.com/v0/b/logintesting-64bd1.appspot.com/o/images.jpeg?alt=media&token=082fbade-96c6-4a5f-887b-28dbc84f03c6" type="image/x-icon" class="school-logo"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+</head>
+<body class="bg-gray-100">
+  <div class="min-h-screen">
+    <!-- Header -->
+    <div class="bg-blue-600 text-white p-4">
+      <div class="container mx-auto flex items-center justify-between">
+        <div class="flex items-center">
+          <a href="javascript:history.back()" class="text-white mr-4">
+            <i class="fas fa-arrow-left text-2xl"></i>
+          </a>
+          <h1 class="text-2xl font-bold">Lectures</h1>
+        </div>
+        <div id="professorName" class="text-lg"></div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+      <!-- Classroom Info -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 id="classroomName" class="text-2xl font-bold mb-4">Loading...</h2>
+        <p id="classCode" class="text-gray-600">Class Code: Loading...</p>
+      </div>
+
+      <!-- Lecture Controls -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Start Classroom Card -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-semibold">Join Classroom</h3>
+            <i class="fas fa-play-circle text-3xl text-green-500"></i>
+          </div>
+          <p class="text-gray-600 mb-4">Join an ongoing lecture session</p>
+          <button onclick="startClassroom()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center">
+            <i class="fas fa-sign-in-alt mr-2"></i>
+            Join Session
+          </button>
+        </div>
+
+        <!-- Attendance Card -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-semibold">Attendance Records</h3>
+            <i class="fas fa-users text-3xl text-blue-500"></i>
+          </div>
+          <p class="text-gray-600 mb-4">View and manage attendance for all sessions</p>
+          <button onclick="viewAttendance()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center">
+            <i class="fas fa-users mr-2"></i>
+            View Attendance
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Sessions -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">Recent Sessions</h2>
+        <div id="recentSessions" class="space-y-4">
+          <!-- Sessions will be dynamically added here -->
+          <div class="flex items-center p-4 border-b">
+            <div class="p-3 bg-gray-100 rounded-full">
+              <i class="fas fa-clock text-gray-600"></i>
+            </div>
+            <div class="ml-4">
+              <p class="text-gray-600">No recent sessions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDMAG-IV_0rZ9IkR3XlBQZohMo-xXGMd4Y",
+      authDomain: "logintesting-64bd1.firebaseapp.com",
+      databaseURL: "https://logintesting-64bd1-default-rtdb.firebaseio.com",
+      projectId: "logintesting-64bd1",
+      storageBucket: "logintesting-64bd1.appspot.com",
+      messagingSenderId: "1065274423800",
+      appId: "1:1065274423800:web:4f3eb8560429f32346be0d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+
+    async function loadLectureDetails() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const classroomId = urlParams.get('classroomId');
+        const userType = urlParams.get('userType');
+        
+        // Get the start/join card elements
+        const actionCard = document.querySelector('[onclick="startClassroom()"]').closest('.bg-white');
+        const actionButton = actionCard.querySelector('button');
+        
+        if (userType === 'student') {
+          
+          document.querySelector('.grid.grid-cols-1').classList.remove('md:grid-cols-2');
+          const attendanceCard = document.querySelector('[onclick="viewAttendance()"]').closest('.bg-white');
+          const recentSessionsCard = document.querySelector('#recentSessions').closest('.bg-white');
+          attendanceCard.style.display = 'none';
+          recentSessionsCard.style.display = 'none';
+
+          
+          actionCard.querySelector('h3').textContent = 'Join Classroom';
+          actionCard.querySelector('p').textContent = 'Join an ongoing lecture session';
+          actionButton.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Join Session';
+        } else {
+          
+          actionCard.querySelector('h3').textContent = 'Start Classroom';
+          actionCard.querySelector('p').textContent = 'Begin a new lecture session for your students';
+          actionButton.innerHTML = '<i class="fas fa-play-circle mr-2"></i>Start New Session';
+        }
+
+        if (classroomId) {
+          const classroomRef = ref(db, `Classrooms/${classroomId}`);
+          const snapshot = await get(classroomRef);
+          
+          if (snapshot.exists()) {
+            const classroomData = snapshot.val();
+            console.log('Classroom Data:', classroomData);
+            
+            
+            document.getElementById('classroomName').textContent = classroomData.name || 'Unnamed Class';
+            document.getElementById('classCode').textContent = `Class Code: ${classroomId}`;
+            
+            
+            if (classroomData.professorId) {
+              const professorRef = ref(db, `users/${classroomData.professorId}`);
+              const professorSnapshot = await get(professorRef);
+              if (professorSnapshot.exists()) {
+                const professorData = professorSnapshot.val();
+                document.getElementById('professorName').textContent = professorData.name || 'Professor';
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading lecture details:', error);
+      }
+    }
+
+    
+    loadLectureDetails();
+
+   
+    window.startClassroom = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const classroomId = urlParams.get('classroomId');
+      const userType = urlParams.get('userType');
+      
+      
+      window.location.href = `video.html?classroomId=${classroomId}&userType=${userType}`;
+    }
+
+    window.viewAttendance = function() {
+      
+      alert('Viewing attendance records...');
+    }
+  </script>
+</body>
+</html> 

@@ -1,0 +1,244 @@
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1c1c1c;
+        }
+        .window {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .title-bar {
+            background-color: #3c3c3c;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+        }
+        .title-bar .buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .title-bar .button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .button.red {
+            background-color: #ff5f56;
+        }
+        .button.yellow {
+            background-color: #ffbd2e;
+        }
+        .button.green {
+            background-color: #27c93f;
+        }
+        .content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 10px;
+            padding: 10px;
+        }
+        .video-tile {
+            position: relative;
+            background-color: #333;
+            border: 2px solid transparent;
+        }
+        .video-tile.active {
+            border-color: yellow;
+        }
+        .video-tile .username {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .video-tile .icon {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            color: white;
+        }
+        .video-tile .icon.muted {
+            color: red;
+        }
+        .footer {
+            background-color: #1c1c1c;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer .left, .footer .right {
+            display: flex;
+            gap: 20px;
+        }
+        .footer .button {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        .footer .button:hover {
+            background-color: #333;
+        }
+        .footer .button.end {
+            color: red;
+        }
+        .center {
+            display: flex;
+            gap: 10px;
+        }
+        .left {
+            position: relative;
+        }
+        .additional-buttons {
+            position: absolute;
+            left: 0;
+            bottom: 100%; /* Change from top: 100% to bottom: 100% */
+            background-color: #3c3c3c;
+            border-radius: 5px;
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .additional-buttons.show {
+            max-height: 200px;
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .additional-buttons .button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #555;
+        }
+        .additional-buttons .button:last-child {
+            border-bottom: none;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #3c3c3c;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        .popup.show {
+            display: block;
+        }
+        .popup .message {
+            color: white;
+            margin-bottom: 20px;
+        }
+        .popup .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        .popup .button {
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .popup .button.confirm {
+            background-color: red;
+            color: white;
+        }
+        .popup .button.cancel {
+            background-color: #555;
+            color: white;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="window">
+       
+        <div class="content">
+           
+        </div>
+        <div class="footer">
+            <div class="left">
+                <button class="button menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+                <div class="additional-buttons" id="additionalButtons">
+                    <button class="button"><i class="fas fa-cog"></i> Settings</button>
+                    <button class="button"><i class="fas fa-question-circle"></i> Help</button>
+                </div>
+            </div>
+            <div class="center">
+                <button class="button"><i class="fas fa-users"></i> Manage Participants</button>
+                <button class="button"><i class="fas fa-video"></i> Stop Video</button>
+                <button class="button"><i class="fas fa-microphone"></i> Mute</button>
+                <button class="button"><i class="fas fa-share-square"></i> Share</button>
+                <button class="button"><i class="fas fa-user-plus"></i> Invite</button>
+                <button class="button"><i class="fas fa-comment"></i> Chat</button>
+            </div>
+            <div class="right">
+                <button class="button end" id="endMeetingButton">End Meeting</button>
+            </div>
+        </div>
+    </div>
+    <div class="popup" id="endMeetingPopup">
+        <div class="message">Are you sure you want to end the meeting?</div>
+        <div class="buttons">
+            <button class="button confirm" id="confirmEndMeeting">Yes</button>
+            <button class="button cancel" id="cancelEndMeeting">No</button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const additionalButtons = document.getElementById('additionalButtons');
+            const endMeetingButton = document.getElementById('endMeetingButton');
+            const endMeetingPopup = document.getElementById('endMeetingPopup');
+            const confirmEndMeeting = document.getElementById('confirmEndMeeting');
+            const cancelEndMeeting = document.getElementById('cancelEndMeeting');
+
+            menuToggle.addEventListener('click', function(event) {
+                additionalButtons.classList.toggle('show');
+                event.stopPropagation(); // Prevent the click from immediately closing the menu
+            });
+
+            // Close the menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!menuToggle.contains(event.target) && !additionalButtons.contains(event.target)) {
+                    additionalButtons.classList.remove('show');
+                }
+            });
+
+            endMeetingButton.addEventListener('click', function() {
+                endMeetingPopup.classList.add('show');
+            });
+
+            confirmEndMeeting.addEventListener('click', function() {
+                // Logic to end the meeting goes here
+                endMeetingPopup.classList.remove('show');
+                alert('Meeting ended');
+            });
+
+            cancelEndMeeting.addEventListener('click', function() {
+                endMeetingPopup.classList.remove('show');
+            });
+        });
+    </script>
+</body>
+</html>

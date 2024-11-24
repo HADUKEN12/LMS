@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>DFCAMCLMS - Assignments</title>
+    <link rel="icon" href="https://firebasestorage.googleapis.com/v0/b/logintesting-64bd1.appspot.com/o/images.jpeg?alt=media&token=082fbade-96c6-4a5f-887b-28dbc84f03c6" type="image/x-icon"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <style>
+        .toggle-animation { transition: transform 0.3s ease-in-out; }
+        .toggle-animation.active { transform: rotate(180deg); }
+        .sidebar-transition { transition: transform 0.3s ease-in-out, margin-left 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-100" id="body">
+    <div class="flex h-screen">
+        <div id="sidebar" class="bg-blue-700 text-white w-64 flex flex-col transition-all duration-300 transform -translate-x-full md:translate-x-0 sidebar-transition">
+            <div class="flex items-center justify-between p-4 bg-blue-600">
+                <div class="flex items-center">
+                 <i class="fas fa-bars text-2xl cursor-pointer md:hidden" onclick="toggleSidebar()">
+                 </i>
+                 <span class="ml-2 text-yellow-400 text-2xl font-bold">
+                  CLASSROOM
+                 </span>
+                </div>
+                <img alt="School logo" class="ml-2" height="30" src="../Dfcam logo.png" width="30"/>
+               </div>
+               <nav class="flex flex-col mt-4">
+                <a class="flex items-center p-4 hover:bg-blue-800" id="dashboardLink" href="#">
+                 <i class="fas fa-tachometer-alt mr-2">
+                 </i>
+                 DASHBOARD
+                 </a>
+                 <a class="flex items-center p-4 bg-blue-800" href="#">
+                 <i class="fas fa-user-graduate mr-2"></i> 
+                 ASSIGNMENTS
+                </a>
+                <a class="flex items-center p-4 hover:bg-blue-800" id="lecturesLink" href="lectures.html">
+                 <i class="fas fa-chalkboard-teacher mr-2">
+                 </i>
+                 LECTURES
+                </a>
+                <a class="flex items-center p-4 hover:bg-blue-800" id="filesLink" href="files.html">
+                 <i class="fas fa-school mr-2">
+                 </i>
+                 UPLOADED FILES
+                </a>
+               </nav>
+               <div class="mt-auto p-4">
+                <i class="fas fa-cog text-2xl">
+                </i>
+               </div>
+        </div>
+
+        <div class="flex-1 flex flex-col sidebar-transition">
+            <div class="flex items-center justify-between p-4 bg-blue-600 text-white">
+                <div class="flex items-center">
+                    <i class="fas fa-bars text-2xl cursor-pointer md:hidden" onclick="toggleSidebar()"></i>
+                    <i class="fas fa-th-large text-2xl ml-4"></i>
+                    <span class="ml-2 text-xl font-bold" id="welcomeMessage">Welcome</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-toggle-on text-2xl mr-4 cursor-pointer toggle-animation" onclick="toggleDarkMode()"></i>
+                    <i class="fas fa-user-circle text-2xl cursor-pointer" onclick="handleUserClick()"></i>
+                </div>
+            </div>
+
+            <div class="flex-1 p-6 bg-gray-100">
+                <div class="max-w-7xl mx-auto w-full">
+                    <div id="professorSection" class="mb-8" style="display: none;">
+                        <button onclick="showAssignmentForm()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center">
+                            <i class="fas fa-plus mr-2"></i>
+                            Create Assignment
+                        </button>
+                    </div>
+
+                    <div id="assignmentsList" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Assignment cards will be added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="assignmentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg">
+            <h2 class="text-xl font-bold mb-4">Create Assignment</h2>
+            <form id="assignmentForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Title</label>
+                    <input type="text" id="assignmentTitle" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea id="assignmentDescription" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" rows="4" required></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Due Date</label>
+                    <input type="datetime-local" id="assignmentDueDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="closeAssignmentForm()" class="bg-gray-300 px-4 py-2 rounded-lg">Cancel</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="logoutPopup" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-xl">
+          <h2 class="text-xl font-bold mb-4">Logout Confirmation</h2>
+          <p class="mb-4">Are you sure you want to logout?</p>
+          <div class="flex justify-end">
+            <button onclick="closeLogoutPopup()" class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded mr-2">
+              Cancel
+            </button>
+            <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+
+    <div id="submissionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg">
+            <h2 class="text-xl font-bold mb-4">Submit Assignment</h2>
+            <form id="submissionForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Upload File</label>
+                    <input type="file" id="submissionFile" 
+                           class="mt-1 block w-full text-sm text-gray-500
+                                  file:mr-4 file:py-2 file:px-4
+                                  file:rounded-full file:border-0
+                                  file:text-sm file:font-semibold
+                                  file:bg-blue-50 file:text-blue-700
+                                  hover:file:bg-blue-100"
+                           accept="image/*,video/*,.pdf,.doc,.docx" 
+                           required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Comments (Optional)</label>
+                    <textarea id="submissionComments" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" rows="3"></textarea>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="closeSubmissionForm()" class="bg-gray-300 px-4 py-2 rounded-lg">Cancel</button>
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="submissionsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Student Submissions</h2>
+                <button onclick="closeSubmissionsModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="submissionsList" class="space-y-4 max-h-96 overflow-y-auto">
+                <!-- Submissions will be listed here -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+    
+        const firebaseConfig = {
+          apiKey: "AIzaSyDMAG-IV_0rZ9IkR3XlBQZohMo-xXGMd4Y",
+          authDomain: "logintesting-64bd1.firebaseapp.com",
+          databaseURL: "https://logintesting-64bd1-default-rtdb.firebaseio.com",
+          projectId: "logintesting-64bd1",
+          storageBucket: "logintesting-64bd1.appspot.com",
+          messagingSenderId: "1065274423800",
+          appId: "1:1065274423800:web:4f3eb8560429f32346be0d"
+        };
+    
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase();
+        const storage = getStorage();
+        
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const userType = urlParams.get('userType');
+        const userId = urlParams.get('userId');
+        const classroomId = urlParams.get('classroomId');
+
+        // Validate required parameters
+        if (!userId || !classroomId || !userType) {
+            console.error('Missing required parameters');
+            alert('Missing required parameters. Please return to the dashboard.');
+            window.location.href = '../login testing.html';
+        }
+
+        // Show professor section if applicable
+        if (userType === 'professor') {
+            document.getElementById('professorSection').style.display = 'block';
+        }
+
+        // Form handling functions
+        window.showAssignmentForm = function() {
+            document.getElementById('assignmentModal').classList.remove('hidden');
+        }
+
+        window.closeAssignmentForm = function() {
+            document.getElementById('assignmentModal').classList.add('hidden');
+        }
+
+        // Handle form submission
+        document.getElementById('assignmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const assignmentData = {
+                title: document.getElementById('assignmentTitle').value,
+                description: document.getElementById('assignmentDescription').value,
+                dueDate: document.getElementById('assignmentDueDate').value,
+                createdBy: userId,
+                createdAt: Date.now()
+            };
+
+            try {
+                // Add to Firebase
+                const assignmentRef = ref(db, `Classrooms/${classroomId}/assignments`);
+                const newAssignmentRef = push(assignmentRef);
+                await set(newAssignmentRef, assignmentData);
+
+                // Close form and reset
+                closeAssignmentForm();
+                document.getElementById('assignmentForm').reset();
+                
+                // Refresh assignments list
+                loadAssignments();
+            } catch (error) {
+                console.error('Error creating assignment:', error);
+            }
+        });
+
+        let currentAssignmentId = null;
+
+        // Update the submitAssignment function
+        window.submitAssignment = function(assignmentId) {
+            currentAssignmentId = assignmentId;
+            document.getElementById('submissionModal').classList.remove('hidden');
+            document.getElementById('submissionForm').reset();
+        }
+
+        window.closeSubmissionForm = function() {
+            document.getElementById('submissionModal').classList.add('hidden');
+            currentAssignmentId = null;
+        }
+
+        // Update the submission form handler
+        document.getElementById('submissionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Show loading state
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Submitting...';
+            
+            const fileInput = document.getElementById('submissionFile');
+            const comments = document.getElementById('submissionComments').value;
+            
+            if (!currentAssignmentId) {
+                alert('Invalid assignment selection. Please try again.');
+                resetSubmitButton();
+                return;
+            }
+
+            if (fileInput.files.length === 0) {
+                alert('Please select a file to upload');
+                resetSubmitButton();
+                return;
+            }
+
+            try {
+                const file = fileInput.files[0];
+                const maxFileSize = 10 * 1024 * 1024; // 10MB limit
+                
+                if (file.size > maxFileSize) {
+                    alert('File size exceeds 10MB limit. Please choose a smaller file.');
+                    resetSubmitButton();
+                    return;
+                }
+
+                // Create a unique filename to prevent overwrites
+                const fileExtension = file.name.split('.').pop();
+                const uniqueFileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
+                
+                const storageReference = storageRef(storage, `submissions/${classroomId}/${currentAssignmentId}/${userId}/${uniqueFileName}`);
+                
+                // Upload file to Firebase Storage
+                const snapshot = await uploadBytes(storageReference, file);
+                const fileUrl = await getDownloadURL(snapshot.ref);
+
+                // Save submission data to Firebase Database
+                const submissionData = {
+                    fileUrl,
+                    fileName: file.name,
+                    uniqueFileName,
+                    fileType: file.type,
+                    comments,
+                    submittedBy: userId,
+                    submittedAt: Date.now(),
+                    status: 'submitted'
+                };
+
+                const submissionRef = ref(db, `Classrooms/${classroomId}/assignments/${currentAssignmentId}/submissions/${userId}`);
+                await set(submissionRef, submissionData);
+
+                // Update assignment status for the student
+                const studentAssignmentRef = ref(db, `Classrooms/${classroomId}/students/${userId}/assignments/${currentAssignmentId}`);
+                await set(studentAssignmentRef, {
+                    status: 'submitted',
+                    submittedAt: Date.now()
+                });
+
+                closeSubmissionForm();
+                alert('Assignment submitted successfully!');
+                loadAssignments();
+                
+            } catch (error) {
+                console.error('Error submitting assignment:', error);
+                let errorMessage = 'Error submitting assignment. ';
+                
+                if (error.code === 'storage/unauthorized') {
+                    errorMessage += 'You are not authorized to upload files.';
+                } else if (error.code === 'storage/canceled') {
+                    errorMessage += 'Upload was cancelled.';
+                } else if (error.code === 'storage/unknown') {
+                    errorMessage += 'An unknown error occurred.';
+                }
+                
+                alert(errorMessage + ' Please try again.');
+            } finally {
+                resetSubmitButton();
+            }
+        });
+
+        function resetSubmitButton() {
+            const submitButton = document.getElementById('submissionForm').querySelector('button[type="submit"]');
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-upload mr-2"></i>Submit';
+        }
+
+        // Update the loadAssignments function
+        async function loadAssignments() {
+            const assignmentsList = document.getElementById('assignmentsList').querySelector('.grid');
+            assignmentsList.innerHTML = '<div class="col-span-full text-center py-8">Loading assignments...</div>';
+
+            try {
+                // Verify classroom access first
+                const classroomRef = ref(db, `Classrooms/${classroomId}`);
+                const classroomSnapshot = await get(classroomRef);
+                
+                if (!classroomSnapshot.exists()) {
+                    throw new Error('Classroom not found');
+                }
+
+                // Get assignments
+                const assignmentRef = ref(db, `Classrooms/${classroomId}/assignments`);
+                const snapshot = await get(assignmentRef);
+
+                assignmentsList.innerHTML = '';
+
+                if (snapshot.exists()) {
+                    const assignments = snapshot.val();
+                    const sortedAssignments = Object.entries(assignments)
+                        .sort((a, b) => new Date(a[1].dueDate) - new Date(b[1].dueDate));
+
+                    for (const [key, data] of sortedAssignments) {
+                        try {
+                            const isPastDue = new Date(data.dueDate) < new Date();
+                            const dueDate = new Date(data.dueDate).toLocaleString();
+                            
+                            let submissionStatus = '';
+                            if (userType === 'student') {
+                                const submissionRef = ref(db, `Classrooms/${classroomId}/assignments/${key}/submissions/${userId}`);
+                                const submissionSnapshot = await get(submissionRef);
+                                
+                                if (submissionSnapshot.exists()) {
+                                    submissionStatus = `<div class="text-green-500 mb-4"><i class="fas fa-check-circle"></i> Submitted</div>`;
+                                } else if (isPastDue) {
+                                    submissionStatus = `<div class="text-red-500 mb-4"><i class="fas fa-times-circle"></i> Past Due</div>`;
+                                } else {
+                                    submissionStatus = `<div class="text-yellow-500 mb-4"><i class="fas fa-clock"></i> Pending</div>`;
+                                }
+                            }
+
+                            const assignmentCard = `
+                                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <h3 class="text-xl font-semibold text-gray-800">${data.title}</h3>
+                                        <span class="text-sm text-gray-500">Due: ${dueDate}</span>
+                                    </div>
+                                    <p class="text-gray-600 mb-4">${data.description}</p>
+                                    ${submissionStatus}
+                                    <div class="flex justify-end space-x-2">
+                                        ${userType === 'student' ? `
+                                            <button onclick="submitAssignment('${key}')" 
+                                                    class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 disabled:opacity-50"
+                                                    ${isPastDue ? 'disabled' : ''}>
+                                                <i class="fas fa-upload mr-2"></i>Submit
+                                            </button>
+                                        ` : `
+                                            <button onclick="viewSubmissions('${key}')" 
+                                                    class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600">
+                                                <i class="fas fa-users mr-2"></i>View Submissions
+                                            </button>
+                                            <button onclick="editAssignment('${key}')" 
+                                                    class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                                                <i class="fas fa-edit mr-2"></i>Edit
+                                            </button>
+                                            <button onclick="deleteAssignment('${key}')" 
+                                                    class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                                                <i class="fas fa-trash mr-2"></i>Delete
+                                            </button>
+                                        `}
+                                    </div>
+                                </div>
+                            `;
+                            assignmentsList.innerHTML += assignmentCard;
+                        } catch (error) {
+                            console.error('Error rendering assignment:', key, error);
+                            // Continue with other assignments if one fails
+                            continue;
+                        }
+                    }
+                } else {
+                    assignmentsList.innerHTML = `
+                        <div class="col-span-full text-center py-8 text-gray-500">
+                            No assignments found
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading assignments:', error);
+                assignmentsList.innerHTML = `
+                    <div class="col-span-full text-center py-8 text-red-500">
+                        ${error.message || 'Error loading assignments. Please refresh the page.'}
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAssignments().catch(error => {
+                console.error('Error during initialization:', error);
+            });
+        });
+
+        // Add these new functions for handling assignment actions
+        window.editAssignment = function(assignmentId) {
+            // Implement edit logic
+            console.log('Edit assignment:', assignmentId);
+        }
+
+        window.deleteAssignment = function(assignmentId) {
+            // Implement delete logic
+            console.log('Delete assignment:', assignmentId);
+        }
+
+        // Add the sidebar toggle and dark mode functions
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.flex-1');
+            sidebar.classList.toggle('-translate-x-full');
+            mainContent.classList.toggle('ml-0');
+            mainContent.classList.toggle('ml-64');
+        }
+
+       
+
+        // Add the user menu handling functions
+        window.handleUserClick = function() {
+            const logoutPopup = document.getElementById('logoutPopup');
+            logoutPopup.classList.remove('hidden');
+        }
+
+        window.closeLogoutPopup = function() {
+            const logoutPopup = document.getElementById('logoutPopup');
+            logoutPopup.classList.add('hidden');
+        }
+
+        window.logout = function() {
+            window.location.href = '../login testing.html';
+        }
+
+        // Add this after your existing URL params setup
+        const dashboardLink = document.getElementById('dashboardLink');
+        dashboardLink.href = `createdClassroom_${classroomId}.html?classroomId=${classroomId}&userId=${userId}&userType=${userType}`;
+
+        // Add these new functions
+        window.viewSubmissions = async function(assignmentId) {
+            try {
+                const submissionsRef = ref(db, `Classrooms/${classroomId}/assignments/${assignmentId}/submissions`);
+                const snapshot = await get(submissionsRef);
+                const submissionsList = document.getElementById('submissionsList');
+                submissionsList.innerHTML = '';
+
+                if (snapshot.exists()) {
+                    const submissions = snapshot.val();
+                    for (const [userId, submission] of Object.entries(submissions)) {
+                        const submissionDate = new Date(submission.submittedAt).toLocaleString();
+                        const submissionHtml = `
+                            <div class="bg-white p-4 rounded-lg shadow">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h3 class="font-semibold">Submitted by: ${userId}</h3>
+                                        <p class="text-sm text-gray-500">Submitted on: ${submissionDate}</p>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <p class="text-gray-600 mb-2">${submission.comments || 'No comments provided'}</p>
+                                    <a href="${submission.fileUrl}" 
+                                       target="_blank" 
+                                       class="inline-flex items-center text-blue-600 hover:text-blue-800">
+                                        <i class="fas fa-download mr-2"></i>
+                                        ${submission.fileName}
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                        submissionsList.innerHTML += submissionHtml;
+                    }
+                } else {
+                    submissionsList.innerHTML = `
+                        <div class="text-center py-4 text-gray-500">
+                            No submissions yet
+                        </div>
+                    `;
+                }
+
+                document.getElementById('submissionsModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error loading submissions:', error);
+                alert('Error loading submissions. Please try again.');
+            }
+        }
+
+        window.closeSubmissionsModal = function() {
+            document.getElementById('submissionsModal').classList.add('hidden');
+        }
+
+        window.editAssignment = async function(assignmentId) {
+            try {
+                // Get current assignment data
+                const assignmentRef = ref(db, `Classrooms/${classroomId}/assignments/${assignmentId}`);
+                const snapshot = await get(assignmentRef);
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    
+                    // Populate form with current data
+                    document.getElementById('assignmentTitle').value = data.title;
+                    document.getElementById('assignmentDescription').value = data.description;
+                    document.getElementById('assignmentDueDate').value = data.dueDate;
+                    
+                    // Show the modal
+                    document.getElementById('assignmentModal').classList.remove('hidden');
+                    
+                    // Update form submission handler for edit mode
+                    const form = document.getElementById('assignmentForm');
+                    form.onsubmit = async (e) => {
+                        e.preventDefault();
+                        
+                        const updatedData = {
+                            title: document.getElementById('assignmentTitle').value,
+                            description: document.getElementById('assignmentDescription').value,
+                            dueDate: document.getElementById('assignmentDueDate').value,
+                            updatedAt: Date.now(),
+                            createdBy: data.createdBy,
+                            createdAt: data.createdAt
+                        };
+
+                        try {
+                            await set(assignmentRef, updatedData);
+                            closeAssignmentForm();
+                            form.reset();
+                            loadAssignments();
+                            
+                            // Reset form submission handler to default (create mode)
+                            form.onsubmit = null;
+                            form.addEventListener('submit', window.createAssignmentHandler);
+                        } catch (error) {
+                            console.error('Error updating assignment:', error);
+                            alert('Error updating assignment. Please try again.');
+                        }
+                    };
+                }
+            } catch (error) {
+                console.error('Error loading assignment for edit:', error);
+                alert('Error loading assignment. Please try again.');
+            }
+        }
+
+        // Add after your dashboardLink setup
+        const lecturesLink = document.getElementById('lecturesLink');
+        const filesLink = document.getElementById('filesLink');
+
+        lecturesLink.href = `lectures.html?classroomId=${classroomId}&userId=${userId}&userType=${userType}`;
+        filesLink.href = `files.html?classroomId=${classroomId}&userId=${userId}&userType=${userType}`;
+    </script>
+</body>
+</html> 
