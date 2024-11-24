@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>DFCAMCLMS - Files</title>
+    <link rel="icon" href="https://firebasestorage.googleapis.com/v0/b/logintesting-64bd1.appspot.com/o/images.jpeg?alt=media&token=082fbade-96c6-4a5f-887b-28dbc84f03c6" type="image/x-icon"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <div class="bg-blue-600 text-white p-4">
+            <div class="container mx-auto flex items-center justify-between">
+                <div class="flex items-center">
+                    <a href="javascript:history.back()" class="text-white mr-4">
+                        <i class="fas fa-arrow-left text-2xl"></i>
+                    </a>
+                    <h1 class="text-2xl font-bold">Uploaded Files</h1>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="container mx-auto px-4 py-8">
+            <!-- Upload Section - Only show for non-students -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8" id="uploadSection" style="display: none;">
+                <h2 class="text-xl font-bold mb-4">Upload New File</h2>
+                <form id="uploadForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">File Title</label>
+                        <input type="text" id="fileTitle" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Description (Optional)</label>
+                        <textarea id="fileDescription" rows="2"
+                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Select File</label>
+                        <input type="file" id="fileInput" required
+                               class="mt-1 block w-full text-sm text-gray-500
+                                      file:mr-4 file:py-2 file:px-4
+                                      file:rounded-full file:border-0
+                                      file:text-sm file:font-semibold
+                                      file:bg-blue-50 file:text-blue-700
+                                      hover:file:bg-blue-100">
+                        <p class="mt-1 text-sm text-gray-500">Max file size: 10MB</p>
+                    </div>
+                    <div>
+                        <button type="submit" 
+                                class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center">
+                            <i class="fas fa-upload mr-2"></i>
+                            Upload File
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Files List -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-bold mb-4">Uploaded Files</h2>
+                <div id="filesList" class="space-y-4">
+                    <!-- Files will be listed here -->
+                    <div class="text-center text-gray-500 py-4">
+                        <i class="fas fa-spinner fa-spin text-2xl"></i>
+                        <p class="mt-2">Loading files...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMAG-IV_0rZ9IkR3XlBQZohMo-xXGMd4Y",
+            authDomain: "logintesting-64bd1.firebaseapp.com",
+            databaseURL: "https://logintesting-64bd1-default-rtdb.firebaseio.com",
+            projectId: "logintesting-64bd1",
+            storageBucket: "logintesting-64bd1.appspot.com",
+            messagingSenderId: "1065274423800",
+            appId: "1:1065274423800:web:4f3eb8560429f32346be0d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase();
+        const storage = getStorage();
+
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const classroomId = urlParams.get('classroomId');
+        const userId = urlParams.get('userId');
+        const userType = urlParams.get('userType');
+
+        // Show upload section only for non-students
+        if (userType !== 'student') {
+            document.getElementById('uploadSection').style.display = 'block';
+        }
+
+        // Handle file upload
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Uploading...';
+
+            try {
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+                const fileTitle = document.getElementById('fileTitle').value;
+                const fileDescription = document.getElementById('fileDescription').value;
+
+                if (!file) {
+                    throw new Error('Please select a file');
+                }
+
+                // Check file size (10MB limit)
+                if (file.size > 10 * 1024 * 1024) {
+                    throw new Error('File size exceeds 10MB limit');
+                }
+
+                // Create unique filename
+                const fileExtension = file.name.split('.').pop();
+                const uniqueFileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
+                
+                // Upload file to Storage
+                const fileRef = storageRef(storage, `classrooms/${classroomId}/files/${uniqueFileName}`);
+                const snapshot = await uploadBytes(fileRef, file);
+                const downloadURL = await getDownloadURL(snapshot.ref);
+
+                // Save file metadata to Database
+                const filesRef = ref(db, `Classrooms/${classroomId}/files`);
+                const newFileRef = push(filesRef);
+                await set(newFileRef, {
+                    title: fileTitle,
+                    description: fileDescription,
+                    fileName: file.name,
+                    fileUrl: downloadURL,
+                    fileType: file.type,
+                    uploadedBy: userId,
+                    uploadedAt: Date.now()
+                });
+
+                // Reset form
+                e.target.reset();
+                loadFiles();
+                alert('File uploaded successfully!');
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert(error.message || 'Error uploading file. Please try again.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+            }
+        });
+
+        // Load and display files
+        async function loadFiles() {
+            const filesList = document.getElementById('filesList');
+            filesList.innerHTML = '<div class="text-center text-gray-500 py-4"><i class="fas fa-spinner fa-spin text-2xl"></i><p class="mt-2">Loading files...</p></div>';
+
+            try {
+                const filesRef = ref(db, `Classrooms/${classroomId}/files`);
+                const snapshot = await get(filesRef);
+
+                if (snapshot.exists()) {
+                    const files = snapshot.val();
+                    filesList.innerHTML = '';
+
+                    Object.entries(files).reverse().forEach(([key, file]) => {
+                        const uploadDate = new Date(file.uploadedAt).toLocaleString();
+                        const fileIcon = getFileIcon(file.fileType);
+                        
+                        filesList.innerHTML += `
+                            <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="text-2xl text-gray-500">
+                                            ${fileIcon}
+                                        </div>
+                                        <div>
+                                            <h3 class="font-semibold text-lg">${file.title}</h3>
+                                            <p class="text-sm text-gray-500">${file.fileName}</p>
+                                            ${file.description ? `<p class="text-gray-600 mt-1">${file.description}</p>` : ''}
+                                            <p class="text-xs text-gray-400 mt-1">Uploaded on ${uploadDate}</p>
+                                        </div>
+                                    </div>
+                                    <a href="${file.fileUrl}" target="_blank" 
+                                       class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm hover:bg-blue-200 transition-colors">
+                                        <i class="fas fa-download mr-1"></i>Download
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    filesList.innerHTML = `
+                        <div class="text-center text-gray-500 py-4">
+                            <i class="fas fa-file-alt text-4xl mb-2"></i>
+                            <p>No files uploaded yet</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading files:', error);
+                filesList.innerHTML = `
+                    <div class="text-center text-red-500 py-4">
+                        <i class="fas fa-exclamation-circle text-4xl mb-2"></i>
+                        <p>Error loading files. Please refresh the page.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Helper function to get appropriate icon for file type
+        function getFileIcon(fileType) {
+            if (fileType.includes('image')) return '<i class="fas fa-file-image"></i>';
+            if (fileType.includes('pdf')) return '<i class="fas fa-file-pdf"></i>';
+            if (fileType.includes('word') || fileType.includes('document')) return '<i class="fas fa-file-word"></i>';
+            if (fileType.includes('sheet') || fileType.includes('excel')) return '<i class="fas fa-file-excel"></i>';
+            if (fileType.includes('video')) return '<i class="fas fa-file-video"></i>';
+            if (fileType.includes('audio')) return '<i class="fas fa-file-audio"></i>';
+            return '<i class="fas fa-file"></i>';
+        }
+
+        // Load files when page loads
+        document.addEventListener('DOMContentLoaded', loadFiles);
+    </script>
+</body>
+</html> 
