@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+
+    <html lang="en">
+        <head>
+            <link rel="icon" href="https://firebasestorage.googleapis.com/v0/b/logintesting-64bd1.appspot.com/o/images.jpeg?alt=media&token=082fbade-96c6-4a5f-887b-28dbc84f03c6"
+          type="image/x-icon" class="school-logo"/>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Create Classroom</title>
+            
+            <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body class="bg-gray-100 flex justify-center items-center min-h-screen">
+            <form id="create-classroom-form" class="p-4 bg-white rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">Create Classroom</h2>
+                    <button type="button" onclick="window.location.href='ListofClassroom.html'" 
+                            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Back
+                    </button>
+                </div>
+                <div class="mb-4">
+                    <label for="classroom-name" class="block text-gray-700 font-bold mb-2">Classroom Name</label>
+                    <input type="text" id="classroom-name" name="classroom-name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+                <div class="mb-4">
+                    <label for="classroom-code" class="block text-gray-700 font-bold mb-2">Classroom Code</label>
+                    <input type="text" id="classroom-code" name="classroom-code" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" readonly>
+                </div>
+                <div class="mb-4">
+                    <label for="year-level" class="block text-gray-700 font-bold mb-2">Year Level</label>
+                    <select id="year-level" name="year-level" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <option value="">Select Year Level</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="professor" class="block text-gray-700 font-bold mb-2">Professor</label>
+                    <select id="professor" name="professor" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <option value="">Loading professors...</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="course" class="block text-gray-700 font-bold mb-2">Course</label>
+                    <select id="course" name="course" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <option value="">Select Course</option>
+                        <option value="BSIS">BSIS</option>
+                        <option value="BSCPE">BSCPE</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="classroom-image" class="block text-gray-700 font-bold mb-2">Classroom Image</label>
+                    <input type="file" id="classroom-image" name="classroom-image" accept="image/jpeg,image/png" 
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" onclick="generateClassroomCode()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Generate Code</button>
+                    <button type="submit" class="ml-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Create Classroom</button>
+                </div>
+                
+            </form>
+
+    <script type="module">
+       
+       
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+        import { getDatabase, ref as dbRef, set, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyDMAG-IV_0rZ9IkR3XlBQZohMo-xXGMd4Y",
+          authDomain: "logintesting-64bd1.firebaseapp.com",
+          databaseURL: "https://logintesting-64bd1-default-rtdb.firebaseio.com",
+          projectId: "logintesting-64bd1",
+          storageBucket: "logintesting-64bd1.appspot.com",
+          messagingSenderId: "1065274423800",
+          appId: "1:1065274423800:web:4f3eb8560429f32346be0d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const storage = getStorage(app);
+
+        async function loadProfessors() {
+            const professorsRef = dbRef(database, 'Professors');
+            try {
+                const snapshot = await get(professorsRef);
+                const professorSelect = document.getElementById('professor');
+                professorSelect.innerHTML = '<option value="">Select Professor</option>';
+                
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const professor = childSnapshot.val();
+                        const option = document.createElement('option');
+                        option.value = childSnapshot.key;
+                        option.textContent = `${professor.name}`;
+                        professorSelect.appendChild(option);
+                    });
+                } else {
+                    professorSelect.innerHTML = '<option value="">No professors available</option>';
+                }
+            } catch (error) {
+                console.error('Error loading professors:', error);
+                document.getElementById('professor').innerHTML = '<option value="">Error loading professors</option>';
+            }
+        }
+
+        function generateClassroomCode() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let code = '';
+            
+            for (let i = 0; i < 5; i++) {
+                code += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+                document.getElementById('classroom-code').value = code;
+                return code;
+            }
+
+            
+          
+        async function uploadClassroomImage(code, imageFile) {
+            try {
+                const configRef = dbRef(database, 'Config');
+                const configSnapshot = await get(configRef);
+                if (!configSnapshot.exists()) {
+                    throw new Error('GitHub configuration not found in database');
+                }
+                const config = configSnapshot.val();
+
+                // Convert image to base64
+                const base64Image = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const base64String = reader.result
+                            .replace('data:', '')
+                            .replace(/^.+,/, '');
+                        resolve(base64String);
+                    };
+                    reader.readAsDataURL(imageFile);
+                });
+
+                const path = `classroom/images/${code}.jpeg`;
+                
+                const response = await fetch(`https://api.github.com/repos/${config.owner}/${config.repo}/contents/${path}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${config.githubToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: `Upload classroom image for ${code}`,
+                        content: base64Image,
+                        branch: 'main'
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`GitHub API Error: ${errorData.message}`);
+                }
+
+                const data = await response.json();
+                return data.content.download_url;
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                throw error;
+            }
+        }
+
+        document.getElementById('create-classroom-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const code = document.getElementById('classroom-code').value;
+            const classroomName = document.getElementById('classroom-name').value;
+            const yearLevel = document.getElementById('year-level').value;
+            const course = document.getElementById('course').value;
+            const professorId = document.getElementById('professor').value;
+            const imageFile = document.getElementById('classroom-image').files[0];
+            
+            if (code && classroomName && yearLevel && course && professorId) {
+                try {
+                    let imageUrl = null;
+                    if (imageFile) {
+                        imageUrl = await uploadClassroomImage(code, imageFile);
+                    }
+                    
+                    createHtmlFile(code, classroomName, yearLevel, course, professorId, imageUrl);
+                } catch (error) {
+                    console.error('Error creating classroom:', error);
+                    alert('Failed to create classroom. Please try again.');
+                }
+            } else {
+                alert('Please fill in all required fields before submitting.');
+            }
+        });
+
+        async function createHtmlFile(code, classroomName, yearLevel, course, professorId, imageUrl) {
+            try {
+                const configRef = dbRef(database, 'Config');
+                const configSnapshot = await get(configRef);
+                if (!configSnapshot.exists()) {
+                    throw new Error('GitHub configuration not found in database');
+                }
+                const config = configSnapshot.val();
+
+                const content = `
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <link rel="icon" href="https://firebasestorage.googleapis.com/v0/b/logintesting-64bd1.appspot.com/o/images.jpeg?alt=media&token=082fbade-96c6-4a5f-887b-28dbc84f03c6"
+          type="image/x-icon" class="school-logo"/>
+                        <title>Created Classroom</title>
+                        <script src="https://cdn.tailwindcss.com">
+                        <\/script>
+
+                        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+                  <style>
+                   .toggle-animation {
+                    transition: transform 0.3s ease-in-out;
+                   }
+                   .toggle-animation.active {
+                    transform: rotate(180deg);
+                   }
+                   .sidebar-transition {
+                    transition: transform 0.3s ease-in-out, margin-left 0.3s ease-in-out;
+                   }
+                    <\/style>
+                        </head>
+                        <body>
+                            <body class="bg-gray-100" id="body">
+                       <div class="flex h-screen">
+                       <!-- Sidebar -->
+                       <div id="sidebar" class="bg-blue-700 text-white w-64 flex flex-col transition-all duration-300 transform -translate-x-full md:translate-x-0 sidebar-transition">
+                        <div class="flex items-center justify-between p-4 bg-blue-600">
+                         <div class="flex items-center">
+                          <i class="fas fa-bars text-2xl cursor-pointer md:hidden" onclick="toggleSidebar()">
+                          </i>
+                          <span class="ml-2 text-yellow-400 text-2xl font-bold">
+                           CLASSROOM
+                          </span>
+                         </div>
+                         <img alt="School logo" class="ml-2" height="30" src="../Dfcam logo.png" width="30"/>
+                        </div>
+                        <nav class="flex flex-col mt-4">
+                         <a class="flex items-center p-4 bg-blue-800" href="">
+                          <i class="fas fa-tachometer-alt mr-2">
+                          </i>
+                          DASHBOARD
+                          </a>
+                          <a class="flex items-center p-4 hover:bg-blue-800" href="#" onclick="navigateToAssignments()"> 
+                          <i class="fas fa-user-graduate mr-2"></i> 
+                          ASSIGNMENTS
+                         </a>
+                         <a class="flex items-center p-4 hover:bg-blue-800" href="#" onclick="navigateToLectures()">
+                          <i class="fas fa-chalkboard-teacher mr-2"></i>
+                          LECTURES
+                         </a>
+                         <a class="flex items-center p-4 hover:bg-blue-800" href=""> 
+                          <i class="fas fa-school mr-2">
+                          </i>
+                          UPLOADED FILES
+                         </a>
+                        </nav>
+                        <div class="mt-auto p-4">
+                         <i class="fas fa-cog text-2xl">
+                         </i>
+                        </div>
+                       </div>
+                       <!-- Main Content -->
+                       <div class="flex-1 flex flex-col sidebar-transition">
+                        <div class="flex items-center justify-between p-4 bg-blue-600 text-white">
+                         <div class="flex items-center">
+                          <i class="fas fa-bars text-2xl cursor-pointer md:hidden" onclick="toggleSidebar()">
+                          </i>
+                          <i class="fas fa-th-large text-2xl ml-4">
+                          </i>
+                          <span class="ml-2 text-xl font-bold" id="welcomeMessage">Welcome</span>
+                         </div>
+                         <div class="flex items-center">
+                          <i class="fas fa-toggle-on text-2xl mr-4 cursor-pointer toggle-animation" onclick="toggleDarkMode()">
+                          </i>
+                           <i class="fas fa-user-circle text-2xl cursor-pointer" onclick="handleUserClick()">
+                          </i>
+                         </div>
+                        </div>
+                        <div class="flex-1 p-6 bg-gray-100">
+                          <!-- Classroom Header Section -->
+                          <div class="mb-8">
+                            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                              <div class="h-64 bg-gray-200 relative">
+                                <img id="classroomImage" src="" alt="Classroom Image" class="w-full h-full object-cover"/>
+                                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                                  <h1 id="classroomName" class="text-3xl font-bold text-white mb-2">Loading...</h1>
+                                  <div class="flex items-center text-white">
+                                    <i class="fas fa-user-tie mr-2"></i>
+                                    <p id="professorName" class="text-lg">Loading...</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Statistics Section -->
+                          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" id="statisticsSection" style="display: none;">
+                            <div class="bg-white rounded-lg shadow-md p-6">
+                              <div class="flex items-center">
+                                <div class="p-3 bg-blue-100 rounded-full">
+                                  <i class="fas fa-users text-blue-600 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                  <h3 class="text-gray-500 text-sm">Students Enrolled</h3>
+                                  <p id="studentCount" class="text-2xl font-semibold">Loading...</p>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow-md p-6">
+                              <div class="flex items-center">
+                                <div class="p-3 bg-green-100 rounded-full">
+                                  <i class="fas fa-book text-green-600 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                  <h3 class="text-gray-500 text-sm">Total Assignments</h3>
+                                  <p id="assignmentCount" class="text-2xl font-semibold">0</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="bg-white rounded-lg shadow-md p-6">
+                              <div class="flex items-center">
+                                <div class="p-3 bg-purple-100 rounded-full">
+                                  <i class="fas fa-video text-purple-600 text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                  <h3 class="text-gray-500 text-sm">Total Lectures</h3>
+                                  <p id="lectureCount" class="text-2xl font-semibold">0</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Add this before the Recent Activity Section -->
+                          <div class="mb-8" id="announcementButtonContainer" style="display: none;">
+                            <button onclick="showAnnouncementPopup()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center">
+                              <i class="fas fa-bullhorn mr-2"></i>
+                              Create Announcement
+                            </button>
+                          </div>
+
+                          <!-- Recent Activity Section -->
+                          <div class="bg-white rounded-lg shadow-md p-6">
+                            <h2 class="text-xl font-semibold mb-4">Recent Activity</h2>
+                            <div id="recentActivity" class="space-y-4">
+                              <!-- Activity items will be dynamically added here -->
+                              <div class="flex items-center p-4 border-b">
+                                <div class="p-3 bg-gray-100 rounded-full">
+                                  <i class="fas fa-clock text-gray-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                  <p class="text-gray-600">No recent activity</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                       </div>
+                      </div>
+
+                      <div id="logoutPopup" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+                        <div class="bg-white p-6 rounded-lg shadow-xl">
+                          <h2 class="text-xl font-bold mb-4">Logout Confirmation</h2>
+                          <p class="mb-4">Are you sure you want to logout?</p>
+                          <div class="flex justify-end">
+                            <button onclick="closeLogoutPopup()" class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded mr-2">
+                              Cancel
+                            </button>
+                            <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+                              Logout
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Add this new popup div before the logout popup -->
+                      <div id="announcementPopup" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+                        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg">
+                          <h2 class="text-xl font-bold mb-4">Create Announcement</h2>
+                          <textarea id="announcementText" class="w-full h-32 p-2 border rounded-lg mb-4" placeholder="Write your announcement here..."></textarea>
+                          <div class="flex justify-end">
+                            <button onclick="closeAnnouncementPopup()" class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded mr-2">
+                              Cancel
+                            </button>
+                            <button onclick="createAnnouncement()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                              Post
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <script>
+                                           
+
+                       function toggleSidebar() {
+                        const sidebar = document.getElementById('sidebar');
+                        const mainContent = document.querySelector('.flex-1');
+                        sidebar.classList.toggle('-translate-x-full');
+                        mainContent.classList.toggle('ml-0');
+                        mainContent.classList.toggle('ml-64');
+                       }
+
+                       function toggleDarkMode() {
+                        const body = document.getElementById('body');
+                        body.classList.toggle('bg-gray-900');
+                        body.classList.toggle('text-white');
+                        const sidebar = document.getElementById('sidebar');
+                        sidebar.classList.toggle('bg-gray-800');
+                        const mainContent = document.querySelector('.flex-1');
+                        mainContent.classList.toggle('bg-gray-800');
+                        const classroomGrid = document.getElementById('classroom-grid');
+                        classroomGrid.classList.toggle('bg-gray-800');
+
+                        // Toggle animation
+                        const toggleIcon = document.querySelector('.fa-toggle-on');
+                        toggleIcon.classList.toggle('active');
+                       }
+
+                       function handleUserClick() {
+                         const logoutPopup = document.getElementById('logoutPopup');
+                         logoutPopup.classList.remove('hidden');
+                       }
+
+                       function closeLogoutPopup() {
+                         const logoutPopup = document.getElementById('logoutPopup');
+                         logoutPopup.classList.add('hidden');
+                       }
+
+                       function logout() {
+                         
+                         window.location.href = '../login testing.html';
+                       }
+                                            <\/script>
+                            </body>
+                            </html>
+                        `;
+
+                    const path = `classroom/createdClassroom_${code}.html`;
+                    
+                 
+                    const response = await fetch(`https://api.github.com/repos/${config.owner}/${config.repo}/contents/${path}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${config.githubToken}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: `Create classroom ${classroomName}`,
+                            content: btoa(content),
+                            branch: 'main'
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`GitHub API Error: ${errorData.message}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    const viewerURL = `https://haduken12.github.io/LMS/classroom/createdClassroom_${code}.html`;
+
+                   
+                    const classroomData = {
+                        code: code,
+                        name: classroomName,
+                        yearLevel: yearLevel,
+                        course: course,
+                        professorId: professorId,
+                        createdAt: new Date().toISOString(),
+                        url: viewerURL,
+                        imageUrl: imageUrl
+                    };
+
+                    
+                    const classroomRef = dbRef(database, `Classrooms/${code}`);
+                    await set(classroomRef, classroomData);
+
+                    
+                    const professorClassroomRef = dbRef(database, `Professors/${professorId}/classrooms/${code}`);
+                    await set(professorClassroomRef, true);
+
+                    const modalHtml = `
+                        <div id="successModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+                            <div class="bg-white p-6 rounded-lg shadow-xl max-w-md">
+                                <h2 class="text-xl font-bold mb-4">Classroom Created Successfully!</h2>
+                                <div class="mb-4">
+                                    <p class="mb-2">Your classroom is ready. Access it using:</p>
+                                    <div class="bg-gray-100 p-2 rounded mb-2">
+                                        <p class="font-bold">Classroom Code: ${code}</p>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <input type="text" value="${viewerURL}" 
+                                               readonly 
+                                               class="w-full p-2 border rounded text-sm" 
+                                               id="classroomLink">
+                                        <button onclick="copyClassroomLink()" 
+                                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                            Copy Link
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end">
+                                    <button onclick="closeSuccessModal()" 
+                                            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+
+                    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                    window.copyClassroomLink = function() {
+                        const linkInput = document.getElementById('classroomLink');
+                        linkInput.select();
+                        document.execCommand('copy');
+                        alert('Link copied to clipboard!');
+                    };
+
+                    window.closeSuccessModal = function() {
+                        document.getElementById('successModal').remove();
+                    };
+
+                    document.getElementById('create-classroom-form').reset();
+                } catch (error) {
+                    console.error('Error creating classroom:', error);
+                    alert(`Failed to create classroom: ${error.message}`);
+                }
+            }
+
+            window.generateClassroomCode = generateClassroomCode;
+
+            loadProfessors();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" href="https://firebasestorage.googleapis.com/v0/b/logintesting-64bd1.appspot.com/o/images.jpeg?alt=media&token=082fbade-96c6-4a5f-887b-28dbc84f03c6"
+          type="image/x-icon" class="school-logo"/>
+    <title>Student Registration</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #1A237E;
+            color: #E0E0E0;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .register-box {
+            background-color: #283593;
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #FFFFFF;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .input-group i {
+            color: #90CAF9;
+            margin-right: 15px;
+            width: 24px;
+            text-align: center;
+            font-size: 20px;
+        }
+        .input-group input {
+            width: calc(100% - 39px);
+            padding: 15px;
+            border: 1px solid #5C6BC0;
+            border-radius: 5px;
+            background-color: #3949AB;
+            color: #FFFFFF;
+            font-size: 16px;
+        }
+        .input-group input:disabled {
+            background-color: #303F9F;
+            cursor: not-allowed;
+        }
+        .btn {
+            background-color: #1E88E5;
+            color: #fff;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #1976D2;
+        }
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .input-group-with-button {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        .input-group-with-button .input-group {
+            margin-bottom: 0;
+            flex: 1;
+        }
+        
+        .verify-btn {
+            background-color: #43A047;
+            color: #fff;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            white-space: nowrap;
+            transition: background-color 0.3s ease;
+        }
+        
+        .verify-btn:hover {
+            background-color: #388E3C;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="register-box">
+            <h2>Student Registration</h2>
+            <form id="registrationForm">
+                <div class="input-group">
+                    <i class="fas fa-id-card"></i>
+                    <input type="text" id="studentId" placeholder="Student ID" disabled>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="fullName" placeholder="Full Name" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-graduation-cap"></i>
+                    <select id="yearLevel" required style="
+                        width: calc(100% - 39px);
+                        padding: 15px;
+                        border: 1px solid #5C6BC0;
+                        border-radius: 5px;
+                        background-color: #3949AB;
+                        color: #FFFFFF;
+                        font-size: 16px;">
+                        <option value="" disabled selected>Select Year Level</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-book"></i>
+                    <select id="course" required style="
+                        width: calc(100% - 39px);
+                        padding: 15px;
+                        border: 1px solid #5C6BC0;
+                        border-radius: 5px;
+                        background-color: #3949AB;
+                        color: #FFFFFF;
+                        font-size: 16px;">
+                        <option value="" disabled selected>Select Course</option>
+                        <option value="BSIS">BSIS</option>
+                        <option value="BSCPE">BSCPE</option>
+                    </select>
+                </div>
+                <div class="input-group-with-button">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" placeholder="Email Address" required>
+                    </div>
+                    <button type="button" id="verifyButton" class="verify-btn">
+                        Verify Email
+                    </button>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Create Password" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+                </div>
+                <button type="submit" class="btn">Register</button>
+            </form>
+            <div id="message"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+        import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMAG-IV_0rZ9IkR3XlBQZohMo-xXGMd4Y",
+            authDomain: "logintesting-64bd1.firebaseapp.com",
+            databaseURL: "https://logintesting-64bd1-default-rtdb.firebaseio.com",
+            projectId: "logintesting-64bd1",
+            storageBucket: "logintesting-64bd1.appspot.com",
+            messagingSenderId: "1065274423800",
+            appId: "1:1065274423800:web:4f3eb8560429f32346be0d"
+        };
+
+       
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const studentId = urlParams.get('studentId');
+        
+        
+        document.getElementById('studentId').value = studentId || '';
+
+        
+        document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const messageElement = document.getElementById('message');
+            
+            // Check if user is signed in and email is verified
+            const currentUser = auth.currentUser;
+            if (!currentUser || !currentUser.emailVerified) {
+                messageElement.textContent = "Please verify your email first before registering!";
+                messageElement.style.color = "#FF8A80";
+                return;
+            }
+            
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            // Basic validation
+            if (password !== confirmPassword) {
+                messageElement.textContent = "Passwords do not match!";
+                messageElement.style.color = "#FF8A80";
+                return;
+            }
+
+            try {
+                // Save user data to Firebase
+                await set(ref(database, 'student/' + studentId), {
+                    student_id: studentId,
+                    username: fullName,
+                    email: email,
+                    password: password,
+                    yearLevel: document.getElementById('yearLevel').value,
+                    course: document.getElementById('course').value
+                });
+
+                messageElement.textContent = "Registration successful! Redirecting to login...";
+                messageElement.style.color = "#A5D6A7";
+
+                // Redirect back to login page after 3 seconds
+                setTimeout(() => {
+                    window.location.href = "login testing.html";
+                }, 3000);
+
+            } catch (error) {
+                messageElement.textContent = "Error during registration: " + error.message;
+                messageElement.style.color = "#FF8A80";
+            }
+        });
+
+        // Handle email verification
+        document.getElementById('verifyButton').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const messageElement = document.getElementById('message');
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await sendEmailVerification(userCredential.user);
+                
+                messageElement.textContent = "Verification email sent! Please check your inbox and click the verification link before registering.";
+                messageElement.style.color = "#A5D6A7";
+            } catch (error) {
+                messageElement.textContent = "Error sending verification: " + error.message;
+                messageElement.style.color = "#FF8A80";
+            }
+        });
+    </script>
+</body>
+</html> 

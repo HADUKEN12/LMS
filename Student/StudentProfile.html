@@ -1,0 +1,333 @@
+<html>
+ <head>
+  <title>Student Profile</title>
+  <link rel="icon" href="https://firebasestorage.googleapis.com/v0/b/logintesting-64bd1.appspot.com/o/images.jpeg?alt=media&token=082fbade-96c6-4a5f-887b-28dbc84f03c6"
+          type="image/x-icon" class="school-logo"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <style>
+   .toggle-animation {
+    transition: transform 0.3s ease-in-out;
+   }
+   .toggle-animation.active {
+    transform: rotate(180deg);
+   }
+  </style>
+ </head>
+ <body class="bg-gray-100" id="body">
+  <div class="flex h-screen">
+   <!-- Sidebar -->
+   <div id="sidebar" class="bg-blue-700 text-white w-64 flex flex-col transition-all duration-300 transform -translate-x-full md:translate-x-0">
+    <div class="flex items-center justify-between p-4 bg-blue-600">
+     <div class="flex items-center">
+      <i class="fas fa-bars text-2xl cursor-pointer md:hidden" onclick="toggleSidebar()"></i>
+      <span class="ml-2 text-yellow-400 text-2xl font-bold">Student Dashboard</span>
+     </div>
+     <img src="../Dfcam logo.png" alt="School logo" width="30" height="30" class="ml-2"/>
+    </div>
+    <nav class="flex flex-col mt-4">
+     <a class="flex items-center p-4 hover:bg-blue-800 w-full" href="Dashboard Student.html">
+      <i class="fas fa-tachometer-alt mr-2"></i>
+      <span class="whitespace-nowrap">DASHBOARD</span>
+     </a>
+     <a class="flex items-center p-4 bg-blue-800 w-full" href="#">
+      <i class="fas fa-user mr-2"></i>
+      <span class="whitespace-nowrap">MY PROFILE</span>
+     </a>
+     <a class="flex items-center p-4 hover:bg-blue-800 w-full" href="StudentCourses.html">
+      <i class="fas fa-book mr-2"></i>
+      <span class="whitespace-nowrap">MY COURSES</span>
+     </a>
+    </nav>
+    <div class="mt-auto p-4">
+     <i class="fas fa-cog text-2xl"></i>
+    </div>
+   </div>
+
+   <!-- Main Content -->
+   <div class="flex-1 flex flex-col">
+    <div class="flex items-center justify-between p-4 bg-blue-600 text-white">
+     <div class="flex items-center">
+      <i class="fas fa-bars text-2xl cursor-pointer md:hidden" onclick="toggleSidebar()"></i>
+      <i class="fas fa-user text-2xl ml-4"></i>
+      <span class="ml-2 text-xl font-bold">My Profile</span>
+     </div>
+     <div class="flex items-center">
+      <i class="fas fa-toggle-on text-2xl mr-4 cursor-pointer toggle-animation" onclick="toggleDarkMode()"></i>
+      <i class="fas fa-user-circle text-2xl cursor-pointer" onclick="handleUserClick()"></i>
+     </div>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="p-6">
+      <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <div class="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
+          <!-- Profile Image -->
+          <div class="w-32 h-32 relative">
+            <img id="profileImage" src="../default-avatar.png" alt="Profile" class="w-full h-full rounded-full object-cover border-4 border-blue-500">
+            <label for="imageUpload" class="absolute bottom-0 right-0 bg-blue-500 rounded-full p-2 cursor-pointer">
+              <i class="fas fa-camera text-white"></i>
+            </label>
+            <input type="file" id="imageUpload" class="hidden" accept="image/*">
+          </div>
+
+          <!-- Profile Information -->
+          <div class="flex-1">
+            <h2 class="text-2xl font-bold mb-4" id="studentName">Loading...</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-3">
+                <div>
+                  <label class="text-gray-600 text-sm">Student ID</label>
+                  <p id="studentId" class="font-medium">Loading...</p>
+                </div>
+                <div>
+                  <label class="text-gray-600 text-sm">Email</label>
+                  <p id="studentEmail" class="font-medium">Loading...</p>
+                </div>
+                <div>
+                  <label class="text-gray-600 text-sm">Course</label>
+                  <p id="studentCourse" class="font-medium">Loading...</p>
+                </div>
+              </div>
+              <div class="space-y-3">
+                <div>
+                  <label class="text-gray-600 text-sm">Year Level</label>
+                  <p id="studentYear" class="font-medium">Loading...</p>
+                </div>
+                <div>
+                  <label class="text-gray-600 text-sm">Contact Number</label>
+                  <p id="studentContact" class="font-medium">Loading...</p>
+                </div>
+                <div>
+                  <label class="text-gray-600 text-sm">Address</label>
+                  <p id="studentAddress" class="font-medium">Loading...</p>
+                </div>
+              </div>
+            </div>
+            <button onclick="toggleEditMode()" class="mt-6 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+              <i class="fas fa-edit mr-2"></i>Edit Profile
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+   </div>
+  </div>
+
+  <!-- Logout Popup -->
+  <div id="logoutPopup" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-xl">
+      <h2 class="text-xl font-bold mb-4">Logout Confirmation</h2>
+      <p class="mb-4">Are you sure you want to logout?</p>
+      <div class="flex justify-end">
+        <button onclick="closeLogoutPopup()" class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded mr-2">
+          Cancel
+        </button>
+        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div id="editProfileModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl">
+      <h2 class="text-xl font-bold mb-4">Edit Profile</h2>
+      <form id="editProfileForm" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2">Name</label>
+            <input type="text" id="editName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+          </div>
+          <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+            <input type="email" id="editEmail" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+          </div>
+          <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2">Contact Number</label>
+            <input type="tel" id="editContact" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+          </div>
+          <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2">Address</label>
+            <input type="text" id="editAddress" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+          </div>
+        </div>
+        <div class="flex justify-end space-x-2 mt-4">
+          <button type="button" onclick="closeEditModal()" class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded">
+            Cancel
+          </button>
+          <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDMAG-IV_0rZ9IkR3XlBQZohMo-xXGMd4Y",
+      authDomain: "logintesting-64bd1.firebaseapp.com",
+      databaseURL: "https://logintesting-64bd1-default-rtdb.firebaseio.com",
+      projectId: "logintesting-64bd1",
+      storageBucket: "logintesting-64bd1.appspot.com",
+      messagingSenderId: "1065274423800",
+      appId: "1:1065274423800:web:4f3eb8560429f32346be0d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+    const storage = getStorage();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentId = urlParams.get('studentId');
+
+    async function loadStudentProfile() {
+      if (!studentId) {
+        console.error("No student ID provided");
+        window.location.href = '../login testing.html';
+        return;
+      }
+
+      // Update navigation links with studentId - FIXED VERSION
+      const dashboardLink = document.querySelector('a[href="Dashboard Student.html"]');
+      const coursesLink = document.querySelector('a[href="StudentCourses.html"]');
+      
+      dashboardLink.href = `Dashboard Student.html?studentId=${studentId}`;
+      coursesLink.href = `StudentCourses.html?studentId=${studentId}`;
+
+      const studentRef = ref(db, `student/${studentId}`);
+      try {
+        const snapshot = await get(studentRef);
+        if (snapshot.exists()) {
+          const studentData = snapshot.val();
+          updateProfileUI(studentData);
+        } else {
+          console.error("No student data found");
+          window.location.href = '../login testing.html';
+        }
+      } catch (error) {
+        console.error("Error loading student info:", error);
+      }
+    }
+
+    function updateProfileUI(studentData) {
+      document.getElementById('studentName').textContent = studentData.username || 'N/A';
+      document.getElementById('studentId').textContent = studentId || 'N/A';
+      document.getElementById('studentEmail').textContent = studentData.email || 'N/A';
+      document.getElementById('studentCourse').textContent = studentData.course || 'N/A';
+      document.getElementById('studentYear').textContent = studentData.yearLevel || 'N/A';
+      document.getElementById('studentContact').textContent = studentData.contactNumber || 'N/A';
+      document.getElementById('studentAddress').textContent = studentData.address || 'N/A';
+      
+      if (studentData.profileImage) {
+        document.getElementById('profileImage').src = studentData.profileImage;
+      }
+    }
+
+    
+    document.getElementById('imageUpload').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const imageRef = storageRef(storage, `profileImages/${studentId}`);
+        try {
+          const snapshot = await uploadBytes(imageRef, file);
+          const downloadURL = await getDownloadURL(imageRef);
+          
+          await set(ref(db, `student/${studentId}/profileImage`), downloadURL);
+          document.getElementById('profileImage').src = downloadURL;
+        } catch (error) {
+          console.error("Error uploading image:", error);
+        }
+      }
+    });
+
+    // Edit profile handling
+    window.toggleEditMode = function() {
+      const modal = document.getElementById('editProfileModal');
+      modal.classList.remove('hidden');
+      
+      // Pre-fill the form
+      const studentData = {
+        username: document.getElementById('studentName').textContent,
+        email: document.getElementById('studentEmail').textContent,
+        contact: document.getElementById('studentContact').textContent,
+        address: document.getElementById('studentAddress').textContent
+      };
+
+      document.getElementById('editName').value = studentData.username;
+      document.getElementById('editEmail').value = studentData.email;
+      document.getElementById('editContact').value = studentData.contact;
+      document.getElementById('editAddress').value = studentData.address;
+    }
+
+    window.closeEditModal = function() {
+      document.getElementById('editProfileModal').classList.add('hidden');
+    }
+
+    document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const updates = {
+        username: document.getElementById('editName').value,
+        email: document.getElementById('editEmail').value,
+        contactNumber: document.getElementById('editContact').value,
+        address: document.getElementById('editAddress').value
+      };
+
+      try {
+        await set(ref(db, `student/${studentId}`), {
+          ...updates,
+          course: document.getElementById('studentCourse').textContent,
+          yearLevel: document.getElementById('studentYear').textContent
+        });
+        
+        closeEditModal();
+        loadStudentProfile();
+      } catch (error) {
+        console.error("Error updating profile:", error);
+      }
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', loadStudentProfile);
+
+    // Utility functions
+    window.toggleSidebar = function() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('-translate-x-full');
+    }
+
+    window.handleUserClick = function() {
+      document.getElementById('logoutPopup').classList.remove('hidden');
+    }
+
+    window.closeLogoutPopup = function() {
+      document.getElementById('logoutPopup').classList.add('hidden');
+    }
+
+    window.logout = function() {
+      window.location.href = '../login testing.html';
+    }
+
+    window.toggleDarkMode = function() {
+      const body = document.getElementById('body');
+      const toggleIcon = document.querySelector('.fa-toggle-on');
+      
+      body.classList.toggle('bg-gray-900');
+      body.classList.toggle('text-white');
+      toggleIcon.classList.toggle('active');
+      
+      // Toggle dark mode for profile card
+      const profileCard = document.querySelector('.bg-white');
+      profileCard.classList.toggle('bg-gray-800');
+      profileCard.classList.toggle('text-white');
+    }
+  </script>
+ </body>
+</html> 

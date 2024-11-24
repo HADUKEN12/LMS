@@ -1,0 +1,216 @@
+<html>
+ <head>
+  <title>Student Courses</title>
+  <link rel="icon" href="https://firebasestorage.googleapis.com/v0/b/logintesting-64bd1.appspot.com/o/images.jpeg?alt=media&token=082fbade-96c6-4a5f-887b-28dbc84f03c6"
+          type="image/x-icon" class="school-logo"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+ </head>
+ <body class="bg-gray-100">
+  <div class="flex h-screen">
+    <!-- Sidebar (similar to StudentProfile.html) -->
+    <div id="sidebar" class="bg-blue-700 text-white w-64 flex flex-col transition-all duration-300 transform -translate-x-full md:translate-x-0">
+      <div class="flex items-center justify-between p-4 bg-blue-600">
+        <div class="flex items-center">
+          <i class="fas fa-bars text-2xl cursor-pointer md:hidden" onclick="toggleSidebar()"></i>
+          <span class="ml-2 text-yellow-400 text-2xl font-bold">Student Dashboard</span>
+        </div>
+        <img src="../Dfcam logo.png" alt="School logo" width="30" height="30" class="ml-2"/>
+      </div>
+      <nav class="flex flex-col mt-4">
+        <a class="flex items-center p-4 hover:bg-blue-800 w-full" href="Dashboard Student.html">
+          <i class="fas fa-tachometer-alt mr-2"></i>
+          <span class="whitespace-nowrap">DASHBOARD</span>
+        </a>
+        <a class="flex items-center p-4 hover:bg-blue-800 w-full" href="StudentProfile.html">
+          <i class="fas fa-user mr-2"></i>
+          <span class="whitespace-nowrap">MY PROFILE</span>
+        </a>
+        <a class="flex items-center p-4 bg-blue-800 w-full" href="#">
+          <i class="fas fa-book mr-2"></i>
+          <span class="whitespace-nowrap">MY COURSES</span>
+        </a>
+      </nav>
+      <div class="mt-auto p-4">
+        <i class="fas fa-cog text-2xl"></i>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 bg-blue-600 text-white">
+        <div class="flex items-center">
+          <i class="fas fa-bars text-2xl cursor-pointer md:hidden" onclick="toggleSidebar()"></i>
+          <i class="fas fa-book text-2xl ml-4"></i>
+          <span class="ml-2 text-xl font-bold">My Courses</span>
+        </div>
+        <div class="flex items-center">
+          <i class="fas fa-user-circle text-2xl cursor-pointer" onclick="handleUserClick()"></i>
+        </div>
+      </div>
+
+      <!-- Courses Content -->
+      <div class="p-6">
+        <div class="max-w-6xl mx-auto">
+          <!-- Student Info Summary -->
+          <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <span class="text-gray-600">Course:</span>
+                <span id="studentCourse" class="font-bold ml-2">Loading...</span>
+              </div>
+              <div>
+                <span class="text-gray-600">Year Level:</span>
+                <span id="studentYear" class="font-bold ml-2">Loading...</span>
+              </div>
+              <div>
+                <span class="text-gray-600">Semester:</span>
+                <span id="currentSemester" class="font-bold ml-2">1st Semester</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Available Courses -->
+          <div id="coursesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Courses will be dynamically added here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Popup -->
+  <div id="logoutPopup" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-xl">
+      <h2 class="text-xl font-bold mb-4">Logout Confirmation</h2>
+      <p class="mb-4">Are you sure you want to logout?</p>
+      <div class="flex justify-end">
+        <button onclick="closeLogoutPopup()" class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded mr-2">
+          Cancel
+        </button>
+        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDMAG-IV_0rZ9IkR3XlBQZohMo-xXGMd4Y",
+      authDomain: "logintesting-64bd1.firebaseapp.com",
+      databaseURL: "https://logintesting-64bd1-default-rtdb.firebaseio.com",
+      projectId: "logintesting-64bd1",
+      storageBucket: "logintesting-64bd1.appspot.com",
+      messagingSenderId: "1065274423800",
+      appId: "1:1065274423800:web:4f3eb8560429f32346be0d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentId = urlParams.get('studentId');
+
+    async function loadStudentCourses() {
+      if (!studentId) {
+        console.error("No student ID provided");
+        window.location.href = '../login testing.html';
+        return;
+      }
+
+      // Update navigation links with studentId
+      const dashboardLink = document.querySelector('a[href="Dashboard Student.html"]');
+      const profileLink = document.querySelector('a[href="StudentProfile.html"]');
+      
+      dashboardLink.href = `Dashboard Student.html?studentId=${studentId}`;
+      profileLink.href = `StudentProfile.html?studentId=${studentId}`;
+
+      try {
+        // Get student info
+        const studentSnapshot = await get(ref(db, `student/${studentId}`));
+        if (studentSnapshot.exists()) {
+          const studentData = studentSnapshot.val();
+          document.getElementById('studentCourse').textContent = studentData.course;
+          document.getElementById('studentYear').textContent = studentData.yearLevel;
+
+          // Get available courses
+          const coursesSnapshot = await get(ref(db, 'courses'));
+          if (coursesSnapshot.exists()) {
+            const coursesData = coursesSnapshot.val();
+            displayAvailableCourses(coursesData, studentData);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+    }
+
+    function displayAvailableCourses(coursesData, studentData) {
+      const coursesList = document.getElementById('coursesList');
+      coursesList.innerHTML = '';
+
+      Object.entries(coursesData).forEach(([courseId, course]) => {
+        if (course.yearLevel === studentData.yearLevel && 
+            course.program === studentData.course) {
+          
+          const courseCard = `
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-blue-600">${course.name}</h3>
+                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                  ${course.units} Units
+                </span>
+              </div>
+              <div class="space-y-2 text-gray-600">
+                <p><i class="fas fa-user-tie mr-2"></i>${course.instructor}</p>
+                <p><i class="fas fa-clock mr-2"></i>${course.schedule}</p>
+                <p><i class="fas fa-location-dot mr-2"></i>${course.room}</p>
+              </div>
+              <div class="mt-4 flex justify-end">
+                <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
+                  View Details
+                </button>
+              </div>
+            </div>
+          `;
+          coursesList.innerHTML += courseCard;
+        }
+      });
+
+      if (coursesList.innerHTML === '') {
+        coursesList.innerHTML = `
+          <div class="col-span-full text-center py-8 text-gray-500">
+            No courses available for your year level and program at this time.
+          </div>
+        `;
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', loadStudentCourses);
+
+    // Utility functions
+    window.toggleSidebar = function() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('-translate-x-full');
+    }
+
+    window.handleUserClick = function() {
+      document.getElementById('logoutPopup').classList.remove('hidden');
+    }
+
+    window.closeLogoutPopup = function() {
+      document.getElementById('logoutPopup').classList.add('hidden');
+    }
+
+    window.logout = function() {
+      window.location.href = '../login testing.html';
+    }
+  </script>
+ </body>
+</html> 
